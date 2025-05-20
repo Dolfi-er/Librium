@@ -24,6 +24,9 @@ namespace Project.Backend.DTOs
 
         [Required]
         public float Rating { get; set; }
+
+        [Required]
+        public List<int> AuthorIds { get; set; }
     }
 
     public class BookUpdateDto
@@ -47,6 +50,9 @@ namespace Project.Backend.DTOs
 
         [Required]
         public float Rating { get; set; }
+
+        [Required]
+        public List<int> AuthorIds { get; set; }
     }
 
     public class BookResponseDto
@@ -58,5 +64,6 @@ namespace Project.Backend.DTOs
         public DateTime AddmissionDate { get; set; }
         public int Quantity { get; set; }
         public float Rating { get; set; }
+        public List<int> AuthorIds { get; set; }
     }
 }

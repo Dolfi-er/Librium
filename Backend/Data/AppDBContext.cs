@@ -7,6 +7,7 @@ namespace Project.Backend.Data
     {
         public AppDBContext(DbContextOptions<AppDBContext> options) : base(options) { }
 
+        // Все DbSet-модели
         public DbSet<UserModel> Users { get; set; }
         public DbSet<BookModel> Books { get; set; }
         public DbSet<AuthorModel> Authors { get; set; }
@@ -19,46 +20,48 @@ namespace Project.Backend.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Составной ключ для TransmissionModel
             modelBuilder.Entity<TransmissionModel>()
                 .HasKey(t => new { t.BookId, t.UserId });
 
+            // Составной ключ для WrittenByModel
             modelBuilder.Entity<WrittenByModel>()
                 .HasKey(w => new { w.BookId, w.AuthorId });
 
+            // Один-к-одному: UserModel -> InfoModel
             modelBuilder.Entity<UserModel>()
                 .HasOne(u => u.Info)
                 .WithOne(i => i.User)
-                .HasForeignKey<InfoModel>(i => i.Id); // Shared primary key
+                .HasForeignKey<InfoModel>(i => i.Id); // Общий первичный ключ
 
+            // Многие-к-одному: UserModel -> RoleModel
             modelBuilder.Entity<UserModel>()
                 .HasOne(u => u.Role)
                 .WithMany(r => r.Users)
                 .HasForeignKey(u => u.RoleId);
 
+            // Многие-к-одному: InfoModel -> HallModel
             modelBuilder.Entity<InfoModel>()
                 .HasOne(i => i.Hall)
                 .WithMany(h => h.Infos)
                 .HasForeignKey(i => i.HallId);
 
+            // Каскадное удаление для Book -> WrittenBy
+            modelBuilder.Entity<BookModel>()
+                .HasMany(b => b.WrittenBys)
+                .WithOne(w => w.Book)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Остальные связи
             modelBuilder.Entity<TransmissionModel>()
                 .HasOne(t => t.Status)
                 .WithMany(s => s.Transmissions)
                 .HasForeignKey(t => t.StatusId);
 
             modelBuilder.Entity<WrittenByModel>()
-                .HasOne(w => w.Book)
-                .WithMany(b => b.WrittenBys)
-                .HasForeignKey(w => w.BookId);
-
-            modelBuilder.Entity<WrittenByModel>()
                 .HasOne(w => w.Author)
                 .WithMany(a => a.WrittenBys)
                 .HasForeignKey(w => w.AuthorId);
-
-            modelBuilder.Entity<TransmissionModel>()
-                .HasOne(t => t.Book)
-                .WithMany(b => b.Transmissions)
-                .HasForeignKey(t => t.BookId);
 
             modelBuilder.Entity<TransmissionModel>()
                 .HasOne(t => t.User)
