@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+
 namespace Project.Backend.Models
 {
     public class RoleModel
@@ -10,6 +12,7 @@ namespace Project.Backend.Models
         public string Name { get; set; }
 
         //nav properties
+        [JsonIgnore]
         public ICollection<UserModel> Users { get; set; }
     }
 }

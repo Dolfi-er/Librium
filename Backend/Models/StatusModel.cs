@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Project.Backend.Models
 {
@@ -11,6 +12,7 @@ namespace Project.Backend.Models
         public string StatusName { get; set; }
 
         //nav properties
+        [JsonIgnore]
         public ICollection<TransmissionModel> Transmissions { get; set; }
     }
 }

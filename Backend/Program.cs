@@ -5,6 +5,7 @@ using Project.Backend.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 
+builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDBContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -13,6 +14,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -20,5 +22,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseRouting(); 
+
+// app.UseAuthorization(); Добавляем авторизацию (если нужно)
+
+app.MapControllers(); 
 
 app.Run();

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Project.Backend.Models
 {
@@ -10,6 +11,7 @@ namespace Project.Backend.Models
         public string AuthorName { get; set; }
 
         //nav properties
+        [JsonIgnore]
         public ICollection<WrittenByModel> WrittenBys { get; set; }
     }
 }

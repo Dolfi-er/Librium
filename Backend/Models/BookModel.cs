@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Project.Backend.Models
 {
@@ -28,7 +29,9 @@ namespace Project.Backend.Models
         public float Rating { get; set; }
 
         //nav properties
+        [JsonIgnore]
         public ICollection<TransmissionModel> Transmissions { get; set; }
+        [JsonIgnore]
         public ICollection<WrittenByModel> WrittenBys { get; set; }
     }
 }

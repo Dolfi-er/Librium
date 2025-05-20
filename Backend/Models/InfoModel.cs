@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Project.Backend.Models
 {
@@ -25,7 +26,9 @@ namespace Project.Backend.Models
         public int? HallId { get; set; }
 
         //nav properties
+        [JsonIgnore]
         public HallModel Hall { get; set; }
+        [JsonIgnore]
         public UserModel User { get; set; }
     }
 }
