@@ -6,9 +6,11 @@ using Project.Backend.Factories;
 using Project.Backend.Models;
 using System.ComponentModel.DataAnnotations;
 using BCrypt.Net;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Project.Backend.Controllers
 {
+    [Authorize(Roles = "Админ")]
     [ApiController]
     [Route("api/[controller]")]
     public class UserController : ControllerBase
