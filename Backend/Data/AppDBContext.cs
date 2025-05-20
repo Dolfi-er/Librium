@@ -32,7 +32,8 @@ namespace Project.Backend.Data
             modelBuilder.Entity<UserModel>()
                 .HasOne(u => u.Info)
                 .WithOne(i => i.User)
-                .HasForeignKey<InfoModel>(i => i.Id); // Общий первичный ключ
+                .HasForeignKey<InfoModel>(i => i.Id) // Общий первичный ключ
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Многие-к-одному: UserModel -> RoleModel
             modelBuilder.Entity<UserModel>()
