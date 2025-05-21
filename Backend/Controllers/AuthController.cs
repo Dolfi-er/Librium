@@ -34,33 +34,41 @@ namespace Project.Backend.Controllers
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.HashedPassword))
             {
-                return Unauthorized("Invalid credentials");
+                return Unauthorized(new { message = "Неверный логин или пароль" });
             }
 
             var token = GenerateJwtToken(user);
             
+            // Настраиваем куки для работы между разными доменами
             Response.Cookies.Append("access_token", token, new CookieOptions
             {
-                HttpOnly = true,
+                HttpOnly = false, // Изменено на false, чтобы JavaScript мог читать куки
                 Secure = true,
-                SameSite = SameSiteMode.None,
-                Expires = DateTime.UtcNow.AddHours(6)
+                SameSite = SameSiteMode.None, // Разрешаем куки для кросс-доменных запросов
+                Expires = DateTime.UtcNow.AddHours(6),
+                Path = "/" // Доступно для всех путей
             });
 
-            return Ok(new { Role = user.Role?.Name });
+            // Возвращаем токен и в теле ответа для дополнительной надежности
+            return Ok(new { 
+                Token = token, 
+                Role = user.Role?.Name 
+            });
         }
 
         [HttpPost("logout")]
-        [Authorize]
         public IActionResult Logout()
         {
+            // Удаляем куки при выходе
             Response.Cookies.Delete("access_token", new CookieOptions
             {
+                HttpOnly = false,
                 Secure = true,
-                SameSite = SameSiteMode.None
+                SameSite = SameSiteMode.None,
+                Path = "/"
             });
 
-            return Ok();
+            return Ok(new { message = "Выход выполнен успешно" });
         }
 
         private string GenerateJwtToken(UserModel user)
