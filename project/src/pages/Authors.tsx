@@ -22,38 +22,17 @@ const Authors = () => {
   const [newAuthorName, setNewAuthorName] = useState('');
   const itemsPerPage = 10;
 
-  useEffect(() => {
+    useEffect(() => {
     const fetchAuthors = async () => {
       setIsLoading(true);
       try {
-        // In a real app, we would fetch from the API
-        // const response = await api.get('/api/Authors');
-        // setAuthors(response.data);
-        
-        // For demo purposes, we're using mock data
-        setTimeout(() => {
-          const mockAuthors = [
-            { id: 1, authorName: 'F. Scott Fitzgerald' },
-            { id: 2, authorName: 'Harper Lee' },
-            { id: 3, authorName: 'George Orwell' },
-            { id: 4, authorName: 'Jane Austen' },
-            { id: 5, authorName: 'J.R.R. Tolkien' },
-            { id: 6, authorName: 'J.D. Salinger' },
-            { id: 7, authorName: 'William Golding' },
-            { id: 8, authorName: 'John Steinbeck' },
-            { id: 9, authorName: 'Aldous Huxley' },
-            { id: 10, authorName: 'Homer' },
-            { id: 11, authorName: 'Mary Shelley' },
-            { id: 12, authorName: 'Charles Dickens' },
-          ];
-          
-          setAuthors(mockAuthors);
-          setFilteredAuthors(mockAuthors);
-          setIsLoading(false);
-        }, 500);
-        
+        const response = await api.get('/api/Authors');
+        setAuthors(response.data);
+        setFilteredAuthors(response.data);
       } catch (error) {
         console.error('Error fetching authors:', error);
+        toast.error('Failed to load authors');
+      } finally {
         setIsLoading(false);
       }
     };
@@ -87,18 +66,10 @@ const Authors = () => {
     }
     
     try {
-      // In a real app, we would create via API
-      // const response = await api.post('/api/Authors', { authorName: newAuthorName });
-      // const newAuthor = response.data;
-      
-      // For demo purposes, create a mock author
-      const newAuthor = {
-        id: authors.length + 1,
-        authorName: newAuthorName
-      };
+      const response = await api.post('/api/Authors', { authorName: newAuthorName });
+      const newAuthor = response.data;
       
       setAuthors([...authors, newAuthor]);
-      setFilteredAuthors([...authors, newAuthor]);
       setNewAuthorName('');
       setShowAddForm(false);
       toast.success('Author created successfully');
@@ -115,10 +86,8 @@ const Authors = () => {
     }
     
     try {
-      // In a real app, we would update via API
-      // await api.put(`/api/Authors/${editingAuthor.id}`, { authorName: newAuthorName });
+      await api.put(`/api/Authors/${editingAuthor.id}`, { authorName: newAuthorName });
       
-      // For demo purposes, update the mock data
       const updatedAuthors = authors.map(author => 
         author.id === editingAuthor.id 
           ? { ...author, authorName: newAuthorName }
@@ -126,7 +95,6 @@ const Authors = () => {
       );
       
       setAuthors(updatedAuthors);
-      setFilteredAuthors(updatedAuthors);
       setEditingAuthor(null);
       setNewAuthorName('');
       toast.success('Author updated successfully');
@@ -142,13 +110,9 @@ const Authors = () => {
     }
     
     try {
-      // In a real app, we would delete via API
-      // await api.delete(`/api/Authors/${id}`);
-      
-      // For demo purposes, update the mock data
+      await api.delete(`/api/Authors/${id}`);
       const updatedAuthors = authors.filter(author => author.id !== id);
       setAuthors(updatedAuthors);
-      setFilteredAuthors(updatedAuthors);
       toast.success('Author deleted successfully');
     } catch (error) {
       console.error('Error deleting author:', error);
