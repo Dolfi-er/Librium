@@ -65,6 +65,52 @@ namespace Project.Backend.Controllers
             };
         }
 
+        // GET: api/transmission/user/{userId}
+        [HttpGet("user/{userId}")]
+        public async Task<ActionResult<IEnumerable<TransmissionResponseDto>>> GetTransmissionsByUser(int userId)
+        {
+            return await _context.Transmissions
+                .Include(t => t.Book)
+                .Include(t => t.User)
+                .Include(t => t.Status)
+                .Where(t => t.UserId == userId)
+                .Select(t => new TransmissionResponseDto
+                {
+                    BookId = t.BookId,
+                    UserId = t.UserId,
+                    IssuanceDate = t.IssuanceDate,
+                    DueDate = t.DueDate,
+                    StatusId = t.StatusId,
+                    BookTitle = t.Book.Title,
+                    UserLogin = t.User.Login,
+                    StatusName = t.Status.StatusName
+                })
+                .ToListAsync();
+        }
+
+        // GET: api/transmission/book/{bookId}
+        [HttpGet("book/{bookId}")]
+        public async Task<ActionResult<IEnumerable<TransmissionResponseDto>>> GetTransmissionsByBook(int bookId)
+        {
+            return await _context.Transmissions
+                .Include(t => t.Book)
+                .Include(t => t.User)
+                .Include(t => t.Status)
+                .Where(t => t.BookId == bookId)
+                .Select(t => new TransmissionResponseDto
+                {
+                    BookId = t.BookId,
+                    UserId = t.UserId,
+                    IssuanceDate = t.IssuanceDate,
+                    DueDate = t.DueDate,
+                    StatusId = t.StatusId,
+                    BookTitle = t.Book.Title,
+                    UserLogin = t.User.Login,
+                    StatusName = t.Status.StatusName
+                })
+                .ToListAsync();
+        }        
+
         // POST: api/transmission
         [HttpPost]
         public async Task<ActionResult<TransmissionResponseDto>> CreateTransmission(

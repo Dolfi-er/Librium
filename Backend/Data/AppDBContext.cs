@@ -20,54 +20,63 @@ namespace Project.Backend.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Составной ключ для TransmissionModel
+            // Составные ключи
             modelBuilder.Entity<TransmissionModel>()
                 .HasKey(t => new { t.BookId, t.UserId });
 
-            // Составной ключ для WrittenByModel
             modelBuilder.Entity<WrittenByModel>()
                 .HasKey(w => new { w.BookId, w.AuthorId });
 
-            // Один-к-одному: UserModel -> InfoModel
+            // Связи для UserModel
             modelBuilder.Entity<UserModel>()
                 .HasOne(u => u.Info)
                 .WithOne(i => i.User)
-                .HasForeignKey<InfoModel>(i => i.Id) // Общий первичный ключ
+                .HasForeignKey<InfoModel>(i => i.Id)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Многие-к-одному: UserModel -> RoleModel
             modelBuilder.Entity<UserModel>()
                 .HasOne(u => u.Role)
                 .WithMany(r => r.Users)
                 .HasForeignKey(u => u.RoleId);
 
-            // Многие-к-одному: InfoModel -> HallModel
+            // Связи для InfoModel
             modelBuilder.Entity<InfoModel>()
                 .HasOne(i => i.Hall)
                 .WithMany(h => h.Infos)
                 .HasForeignKey(i => i.HallId);
 
-            // Каскадное удаление для Book -> WrittenBy
+            // Каскадные удаления для BookModel
             modelBuilder.Entity<BookModel>()
                 .HasMany(b => b.WrittenBys)
                 .WithOne(w => w.Book)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Остальные связи
+            // Каскадные удаления для AuthorModel -> WrittenByModel
+            modelBuilder.Entity<WrittenByModel>()
+                .HasOne(w => w.Author)
+                .WithMany(a => a.WrittenBys)
+                .HasForeignKey(w => w.AuthorId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Связи для TransmissionModel
             modelBuilder.Entity<TransmissionModel>()
                 .HasOne(t => t.Status)
                 .WithMany(s => s.Transmissions)
                 .HasForeignKey(t => t.StatusId);
 
-            modelBuilder.Entity<WrittenByModel>()
-                .HasOne(w => w.Author)
-                .WithMany(a => a.WrittenBys)
-                .HasForeignKey(w => w.AuthorId);
-
+            // Каскадные удаления для User -> Transmission
             modelBuilder.Entity<TransmissionModel>()
                 .HasOne(t => t.User)
                 .WithMany()
-                .HasForeignKey(t => t.UserId);
+                .HasForeignKey(t => t.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Каскадные удаления для Book -> Transmission
+            modelBuilder.Entity<TransmissionModel>()
+                .HasOne(t => t.Book)
+                .WithMany(b => b.Transmissions)
+                .HasForeignKey(t => t.BookId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
