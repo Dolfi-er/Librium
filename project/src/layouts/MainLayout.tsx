@@ -12,11 +12,11 @@ const MainLayout = () => {
   const { logout } = useAuthStore();
   
   const navigation = [
-    { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-    { name: 'Books', href: '/books', icon: BookOpen },
-    { name: 'Authors', href: '/authors', icon: BookMarked },
-    { name: 'Users', href: '/users', icon: User },
-    { name: 'Transmissions', href: '/transmissions', icon: BookCopy },
+    { name: 'Дэшборд', href: '/', icon: LayoutDashboard },
+    { name: 'Книги', href: '/books', icon: BookOpen },
+    { name: 'Авторы', href: '/authors', icon: BookMarked },
+    { name: 'Пользователи', href: '/users', icon: User },
+    { name: 'Книговыдача', href: '/transmissions', icon: BookCopy },
   ];
 
   // Close sidebar when clicking outside on mobile

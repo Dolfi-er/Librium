@@ -40,24 +40,24 @@ const Books = () => {
       setFilteredBooks(response.data);
     } catch (error) {
       console.error('Error fetching books:', error);
-      toast.error('Failed to load books');
+      toast.error('Не удалось загрузить книги');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDeleteBook = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this book?')) {
+    if (!confirm('Вы уверены, что хотите удалить эту книгу?')) {
       return;
     }
 
     try {
       await api.delete(`/api/Books/${id}`);
-      toast.success('Book deleted successfully');
+      toast.success('Книга удалена');
       fetchBooks(); // Refresh the list
     } catch (error) {
       console.error('Error deleting book:', error);
-      toast.error('Failed to delete book');
+      toast.error('Не удалось удалить книгу');
     }
   };
 
@@ -94,14 +94,14 @@ const Books = () => {
     <div className="animate-fadeIn">
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-bold text-gray-900">Books</h1>
-          <p className="text-gray-600 mt-1">Manage your library books</p>
+          <h1 className="font-bold text-gray-900">Книги</h1>
+          <p className="text-gray-600 mt-1">Управление книгами в вашей библиотеке</p>
         </div>
         <button
           onClick={() => setShowBookForm(true)}
           className="btn btn-primary btn-md mt-4 sm:mt-0"
         >
-          <Plus className="mr-2 h-4 w-4" /> Add Book
+          <Plus className="mr-2 h-4 w-4" /> Добавить книгу
         </button>
       </div>
 
@@ -111,7 +111,7 @@ const Books = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Search by title or ISBN..."
+              placeholder="Поиск по названию или ISBN..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="input pl-9"
@@ -121,7 +121,7 @@ const Books = () => {
             onClick={() => setShowFilters(!showFilters)}
             className={`btn ${showFilters ? 'btn-accent' : 'btn-ghost'} btn-md border border-gray-200`}
           >
-            <Filter className="mr-2 h-4 w-4" /> Filter
+            <Filter className="mr-2 h-4 w-4" /> Фильтр
           </button>
         </div>
       </div>
@@ -140,18 +140,18 @@ const Books = () => {
             {filteredBooks.length === 0 ? (
               <div className="flex flex-col items-center justify-center p-8 text-center">
                 <BookOpen className="h-12 w-12 text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-700">No books found</h3>
+                <h3 className="text-lg font-medium text-gray-700">Книги не найдены</h3>
                 <p className="text-gray-500 mt-2">
                   {searchTerm.trim() !== '' 
-                    ? `No books match the search "${searchTerm}"`
-                    : "Your library is empty. Add books to get started."}
+                    ? `Ни одной книги не найдено по запросу "${searchTerm}"`
+                    : "Ваша библиотека пуста. Добавьте книги, чтобы начать."}
                 </p>
                 {searchTerm.trim() !== '' && (
                   <button
                     onClick={() => setSearchTerm('')}
                     className="btn btn-ghost btn-sm mt-4 text-blue-600"
                   >
-                    Clear search
+                    Очистить поиск
                   </button>
                 )}
               </div>
@@ -159,12 +159,12 @@ const Books = () => {
               <table className="table">
                 <thead>
                   <tr>
-                    <th>Title</th>
+                    <th>Название</th>
                     <th>ISBN</th>
-                    <th className="hidden sm:table-cell">Added On</th>
-                    <th className="hidden md:table-cell">Quantity</th>
-                    <th className="hidden md:table-cell">Rating</th>
-                    <th>Actions</th>
+                    <th className="hidden sm:table-cell">Дата добавления</th>
+                    <th className="hidden md:table-cell">Количество</th>
+                    <th className="hidden md:table-cell">Рейтинг</th>
+                    <th>Управление</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -206,7 +206,7 @@ const Books = () => {
           {filteredBooks.length > 0 && (
             <div className="flex items-center justify-between my-6">
               <div className="text-sm text-gray-600">
-                Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredBooks.length)} of {filteredBooks.length} books
+                Показывается {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredBooks.length)} из {filteredBooks.length} книг
               </div>
               
               <div className="flex items-center space-x-2">
@@ -219,7 +219,7 @@ const Books = () => {
                 </button>
                 
                 <div className="text-sm font-medium">
-                  Page {currentPage} of {totalPages}
+                  Страница {currentPage} из {totalPages}
                 </div>
                 
                 <button

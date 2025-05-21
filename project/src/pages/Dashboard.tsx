@@ -70,8 +70,8 @@ const Dashboard = () => {
   return (
     <div className="animate-fadeIn">
       <div className="mb-6">
-        <h1 className="font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-1">Library management system overview</p>
+        <h1 className="font-bold text-gray-900">Дэшборд</h1>
+        <p className="text-gray-600 mt-1">Обзор состояния вашей библиотеки</p>
       </div>
 
       {isLoading ? (
@@ -88,10 +88,10 @@ const Dashboard = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard title="Total Books" value={stats.totalBooks} icon={BookOpen} color="bg-blue-500" />
-          <StatCard title="Total Authors" value={stats.totalAuthors} icon={BookMarked} color="bg-teal-500" />
-          <StatCard title="Total Users" value={stats.totalUsers} icon={Users} color="bg-indigo-500" />
-          <StatCard title="Overdue Books" value={stats.overdueBooks} icon={AlertTriangle} color="bg-red-500" />
+          <StatCard title="Всего книг" value={stats.totalBooks} icon={BookOpen} color="bg-blue-500" />
+          <StatCard title="Всего авторов" value={stats.totalAuthors} icon={BookMarked} color="bg-teal-500" />
+          <StatCard title="Всего пользователей" value={stats.totalUsers} icon={Users} color="bg-indigo-500" />
+          <StatCard title="Задержанных книг" value={stats.overdueBooks} icon={AlertTriangle} color="bg-red-500" />
         </div>
       )}
 
@@ -99,9 +99,9 @@ const Dashboard = () => {
         {/* Recent Transmissions */}
         <div className="lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-medium">Recent Book Transmissions</h2>
+            <h2 className="text-lg font-medium">Недавно выданные книги</h2>
             <Link to="/transmissions" className="text-sm text-blue-600 hover:text-blue-800">
-              View all
+              Посмотреть все
             </Link>
           </div>
           
@@ -120,10 +120,10 @@ const Dashboard = () => {
               <table className="table">
                 <thead>
                   <tr>
-                    <th>Book</th>
-                    <th>User</th>
-                    <th>Due Date</th>
-                    <th>Status</th>
+                    <th>Книга</th>
+                    <th>Пользователь</th>
+                    <th>Дата возврата</th>
+                    <th>Статус</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -156,14 +156,14 @@ const Dashboard = () => {
 
         {/* Quick Actions */}
         <div>
-          <h2 className="text-lg font-medium mb-4">Quick Actions</h2>
+          <h2 className="text-lg font-medium mb-4">Быстрые действия</h2>
           <div className="card p-4 flex flex-col gap-3">
             <Link 
               to="/books" 
               className="btn btn-primary btn-md justify-start"
             >
               <BookOpen className="mr-2 h-5 w-5" />
-              Browse Books
+              Просмотр книг
             </Link>
             
             <Link 
@@ -171,7 +171,7 @@ const Dashboard = () => {
               className="btn btn-secondary btn-md justify-start"
             >
               <BookCopy className="mr-2 h-5 w-5" />
-              Issue/Return Book
+              Выдать/Вернуть книгу
             </Link>
             
             <Link 
@@ -179,7 +179,7 @@ const Dashboard = () => {
               className="btn btn-accent btn-md justify-start"
             >
               <Users className="mr-2 h-5 w-5" />
-              Manage Users
+              Управление пользователями
             </Link>
             
             <Link 
@@ -187,7 +187,7 @@ const Dashboard = () => {
               className="btn btn-ghost btn-md justify-start border border-gray-200"
             >
               <Clock className="mr-2 h-5 w-5 text-red-500" />
-              Check Overdue Books
+              Проверить задержанные книги
             </Link>
           </div>
         </div>

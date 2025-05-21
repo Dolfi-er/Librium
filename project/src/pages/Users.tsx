@@ -54,24 +54,24 @@ const Users = () => {
       setRoles(rolesResponse.data);
     } catch (error) {
       console.error('Error fetching data:', error);
-      toast.error('Failed to load users');
+      toast.error('Не удалось загрузить пользователей');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDeleteUser = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this user?')) {
+    if (!confirm('Вы уверены, что хотите удалить этого пользователя?')) {
       return;
     }
 
     try {
       await api.delete(`/api/User/${id}`);
-      toast.success('User deleted successfully');
+      toast.success('Пользователь удален');
       fetchUsersAndRoles(); // Refresh the list
     } catch (error) {
       console.error('Error deleting user:', error);
-      toast.error('Failed to delete user');
+      toast.error('Не удалось удалить пользователя');
     }
   };
 
@@ -117,8 +117,8 @@ const Users = () => {
     <div className="animate-fadeIn">
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-bold text-gray-900">Users</h1>
-          <p className="text-gray-600 mt-1">Manage library users and staff</p>
+          <h1 className="font-bold text-gray-900">Пользователи</h1>
+          <p className="text-gray-600 mt-1">Управление пользователями в вашей библиотеке</p>
         </div>
         <button
           onClick={() => {
@@ -127,7 +127,7 @@ const Users = () => {
           }}
           className="btn btn-primary btn-md mt-4 sm:mt-0"
         >
-          <Plus className="mr-2 h-4 w-4" /> Add User
+          <Plus className="mr-2 h-4 w-4" /> Добавить пользователя
         </button>
       </div>
 
@@ -137,7 +137,7 @@ const Users = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Search by name, login, or phone..."
+              placeholder="Поиск по имени, логину или телефону..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="input pl-9"
@@ -150,7 +150,7 @@ const Users = () => {
               onChange={(e) => setRoleFilter(e.target.value ? Number(e.target.value) : null)}
               className="input"
             >
-              <option value="">All Roles</option>
+              <option value="">Все роли</option>
               {roles.map(role => (
                 <option key={role.id} value={role.id}>{role.name}</option>
               ))}
@@ -161,7 +161,7 @@ const Users = () => {
                 onClick={clearFilters}
                 className="btn btn-ghost btn-md border border-gray-200"
               >
-                <X className="mr-2 h-4 w-4" /> Clear Filters
+                <X className="mr-2 h-4 w-4" /> Очистить фильтры
               </button>
             )}
           </div>
@@ -182,18 +182,18 @@ const Users = () => {
             {filteredUsers.length === 0 ? (
               <div className="flex flex-col items-center justify-center p-8 text-center">
                 <UserCircle className="h-12 w-12 text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-700">No users found</h3>
+                <h3 className="text-lg font-medium text-gray-700">Пользователи не найдены</h3>
                 <p className="text-gray-500 mt-2">
                   {searchTerm.trim() !== '' || roleFilter !== null
-                    ? "No users match your search criteria"
-                    : "Your user list is empty. Add users to get started."}
+                    ? "Ни один пользователь не соответствует запросу"
+                    : "Ваш список пользователей пуст. Добавьте пользователей, чтобы начать."}
                 </p>
                 {(searchTerm.trim() !== '' || roleFilter !== null) && (
                   <button
                     onClick={clearFilters}
                     className="btn btn-ghost btn-sm mt-4 text-blue-600"
                   >
-                    Clear filters
+                    Очистить фильтры
                   </button>
                 )}
               </div>
@@ -201,12 +201,12 @@ const Users = () => {
               <table className="table">
                 <thead>
                   <tr>
-                    <th>Name</th>
-                    <th>Login</th>
-                    <th className="hidden md:table-cell">Phone</th>
-                    <th>Role</th>
-                    <th className="hidden sm:table-cell">Ticket #</th>
-                    <th>Actions</th>
+                    <th>Имя</th>
+                    <th>Логин</th>
+                    <th className="hidden md:table-cell">Телефон</th>
+                    <th>Роль</th>
+                    <th className="hidden sm:table-cell">№ билета</th>
+                    <th>Управление</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -254,7 +254,7 @@ const Users = () => {
           {filteredUsers.length > 0 && (
             <div className="flex items-center justify-between my-6">
               <div className="text-sm text-gray-600">
-                Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredUsers.length)} of {filteredUsers.length} users
+                Показывается {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredUsers.length)} из {filteredUsers.length} по
               </div>
               
               <div className="flex items-center space-x-2">
@@ -267,7 +267,7 @@ const Users = () => {
                 </button>
                 
                 <div className="text-sm font-medium">
-                  Page {currentPage} of {totalPages}
+                  Страница {currentPage} из {totalPages}
                 </div>
                 
                 <button

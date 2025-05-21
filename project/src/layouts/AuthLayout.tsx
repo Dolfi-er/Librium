@@ -13,7 +13,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
           <BookOpen className="h-12 w-12 text-blue-500" />
         </div>
         <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
-          Library Management System
+          Librium
         </h2>
       </div>
 

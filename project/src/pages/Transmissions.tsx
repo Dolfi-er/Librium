@@ -54,29 +54,29 @@ const Transmissions = () => {
 
       // Check if URL has filter=overdue parameter
       const params = new URLSearchParams(location.search);
-      if (params.get('filter') === 'overdue') {
+      if (params.get('filter') === 'Задержана') {
         setShowOverdueOnly(true);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
-      toast.error('Failed to load transmissions');
+      toast.error('Неудалось загрузить записи книговыдачи');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDeleteTransmission = async (bookId: number, userId: number) => {
-    if (!confirm('Are you sure you want to delete this transmission?')) {
+    if (!confirm('Вы уверены, что хотите удалить эту запись книговыдачи?')) {
       return;
     }
 
     try {
       await api.delete(`/api/Transmission/${bookId}/${userId}`);
-      toast.success('Transmission deleted successfully');
+      toast.success('Запись книговыдачи удалена');
       fetchTransmissionsAndStatuses(); // Refresh the list
     } catch (error) {
       console.error('Error deleting transmission:', error);
-      toast.error('Failed to delete transmission');
+      toast.error('Не удалось удалить запись книговыдачи');
     }
   };
 
@@ -91,11 +91,11 @@ const Transmissions = () => {
         statusId: returnedStatusId
       });
 
-      toast.success('Book marked as returned');
+      toast.success('Книга отмечена как возвращенная');
       fetchTransmissionsAndStatuses(); // Refresh the list
     } catch (error) {
       console.error('Error updating transmission:', error);
-      toast.error('Failed to mark book as returned');
+      toast.error('Не удалось отметить книгу как возвращенную');
     }
   };
 
@@ -141,14 +141,14 @@ const Transmissions = () => {
     <div className="animate-fadeIn">
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-bold text-gray-900">Book Transmissions</h1>
-          <p className="text-gray-600 mt-1">Manage book loans and returns</p>
+          <h1 className="font-bold text-gray-900">Книговыдача</h1>
+          <p className="text-gray-600 mt-1">Управление записями книговыдачи и возвратами</p>
         </div>
         <button
           onClick={() => setShowForm(true)}
           className="btn btn-primary btn-md mt-4 sm:mt-0"
         >
-          <Plus className="mr-2 h-4 w-4" /> Issue Book
+          <Plus className="mr-2 h-4 w-4" /> Выдать книгу
         </button>
       </div>
 
@@ -158,7 +158,7 @@ const Transmissions = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Search by book title or user..."
+              placeholder="Поиск по названию или пользователю..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="input pl-9"
@@ -171,7 +171,7 @@ const Transmissions = () => {
               onChange={(e) => setStatusFilter(e.target.value ? Number(e.target.value) : null)}
               className="input"
             >
-              <option value="">All Statuses</option>
+              <option value="">Все статусы</option>
               {statuses.map(status => (
                 <option key={status.id} value={status.id}>{status.statusName}</option>
               ))}
@@ -182,7 +182,7 @@ const Transmissions = () => {
               className={`btn btn-md ${showOverdueOnly ? 'btn-accent' : 'btn-ghost border border-gray-200'}`}
             >
               <AlertTriangle className={`mr-2 h-4 w-4 ${showOverdueOnly ? 'text-white' : 'text-red-500'}`} /> 
-              Overdue Only
+              Только задержанные
             </button>
             
             {(searchTerm || statusFilter !== null || showOverdueOnly) && (
@@ -190,7 +190,7 @@ const Transmissions = () => {
                 onClick={clearFilters}
                 className="btn btn-ghost btn-md border border-gray-200"
               >
-                <X className="mr-2 h-4 w-4" /> Clear Filters
+                <X className="mr-2 h-4 w-4" /> Очистить фильтры
               </button>
             )}
           </div>
@@ -211,18 +211,18 @@ const Transmissions = () => {
             {filteredTransmissions.length === 0 ? (
               <div className="flex flex-col items-center justify-center p-8 text-center">
                 <BookCopy className="h-12 w-12 text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-700">No transmissions found</h3>
+                <h3 className="text-lg font-medium text-gray-700">Записи книговыдачи не найдены</h3>
                 <p className="text-gray-500 mt-2">
                   {searchTerm.trim() !== '' || statusFilter !== null || showOverdueOnly
-                    ? "No transmissions match your search criteria"
-                    : "No book transmissions recorded yet."}
+                    ? "Ни одна запись книговыдачи не соответствует запросу"
+                    : "Отсутствуют записи книговыдачи."}
                 </p>
                 {(searchTerm.trim() !== '' || statusFilter !== null || showOverdueOnly) && (
                   <button
                     onClick={clearFilters}
                     className="btn btn-ghost btn-sm mt-4 text-blue-600"
                   >
-                    Clear filters
+                    Очистить фильтры
                   </button>
                 )}
               </div>
@@ -230,12 +230,12 @@ const Transmissions = () => {
               <table className="table">
                 <thead>
                   <tr>
-                    <th>Book</th>
-                    <th>User</th>
-                    <th className="hidden sm:table-cell">Issue Date</th>
-                    <th>Due Date</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <th>Книга</th>
+                    <th>Пользователь</th>
+                    <th className="hidden sm:table-cell">Дата выдачи</th>
+                    <th>Дата возврата</th>
+                    <th>Статус</th>
+                    <th>Управление</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -247,18 +247,18 @@ const Transmissions = () => {
                       <td>{new Date(transmission.dueDate).toLocaleDateString()}</td>
                       <td>
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          transmission.statusName === 'Active' 
+                          transmission.statusName === 'Выдана' 
                             ? 'bg-blue-100 text-blue-800' 
-                            : transmission.statusName === 'Returned'
+                            : transmission.statusName === 'Возвращена'
                               ? 'bg-green-100 text-green-800'
-                              : transmission.statusName === 'Overdue'
+                              : transmission.statusName === 'Задержана'
                                 ? 'bg-red-100 text-red-800'
                                 : 'bg-gray-100 text-gray-800'
                         }`}>
-                          {transmission.statusName === 'Overdue' && (
+                          {transmission.statusName === 'Задержана' && (
                             <AlertTriangle className="mr-1 h-3 w-3" />
                           )}
-                          {transmission.statusName === 'Returned' && (
+                          {transmission.statusName === 'Возвращена' && (
                             <CheckCircle className="mr-1 h-3 w-3" />
                           )}
                           {transmission.statusName}
@@ -266,7 +266,7 @@ const Transmissions = () => {
                       </td>
                       <td>
                         <div className="flex space-x-2">
-                          {transmission.statusName === 'Active' && (
+                          {transmission.statusName === 'Выдана' && (
                             <button
                               onClick={() => handleMarkAsReturned(transmission)}
                               title="Mark as Returned"
@@ -294,7 +294,7 @@ const Transmissions = () => {
           {filteredTransmissions.length > 0 && (
             <div className="flex items-center justify-between my-6">
               <div className="text-sm text-gray-600">
-                Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredTransmissions.length)} of {filteredTransmissions.length} transmissions
+                Показывается {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredTransmissions.length)} из {filteredTransmissions.length} записей
               </div>
               
               <div className="flex items-center space-x-2">
@@ -307,7 +307,7 @@ const Transmissions = () => {
                 </button>
                 
                 <div className="text-sm font-medium">
-                  Page {currentPage} of {totalPages}
+                  Страница {currentPage} из {totalPages}
                 </div>
                 
                 <button
@@ -328,7 +328,7 @@ const Transmissions = () => {
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md animate-fadeIn">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-medium">Issue Book</h2>
+              <h2 className="text-xl font-medium">Выдать книгу</h2>
               <button
                 onClick={() => setShowForm(false)}
                 className="p-1 rounded-full hover:bg-gray-100"
@@ -340,7 +340,7 @@ const Transmissions = () => {
             <form className="space-y-4">
               <div>
                 <label htmlFor="book" className="block text-sm font-medium text-gray-700 mb-1">
-                  Book
+                  Книга
                 </label>
                 <div className="relative">
                   <BookOpen className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -356,7 +356,7 @@ const Transmissions = () => {
               
               <div>
                 <label htmlFor="user" className="block text-sm font-medium text-gray-700 mb-1">
-                  User
+                  Пользователь
                 </label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -372,7 +372,7 @@ const Transmissions = () => {
               
               <div>
                 <label htmlFor="issueDate" className="block text-sm font-medium text-gray-700 mb-1">
-                  Issue Date
+                  Дата выдачи
                 </label>
                 <div className="relative">
                   <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -387,7 +387,7 @@ const Transmissions = () => {
               
               <div>
                 <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700 mb-1">
-                  Due Date
+                  Дата возврата
                 </label>
                 <div className="relative">
                   <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -406,17 +406,17 @@ const Transmissions = () => {
                   onClick={() => setShowForm(false)}
                   className="btn btn-ghost btn-md border border-gray-200"
                 >
-                  Cancel
+                  Отмена
                 </button>
                 <button
                   type="button"
                   onClick={() => {
                     setShowForm(false);
-                    toast.success('Book issued successfully');
+                    toast.success('Книга выдана успешно');
                   }}
                   className="btn btn-primary btn-md"
                 >
-                  Issue Book
+                  Выдать книгу
                 </button>
               </div>
             </form>
