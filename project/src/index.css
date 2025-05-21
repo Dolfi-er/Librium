@@ -1,0 +1,135 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 210 40% 98%;
+    
+    --secondary: 172.5 84% 50.6%;
+    --secondary-foreground: 210 40% 98%;
+    
+    --accent: 31.8 81.3% 51.4%;
+    --accent-foreground: 210 40% 98%;
+    
+    --success: 142.1 76.2% 36.3%;
+    --success-foreground: 355.7 100% 97.3%;
+    
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 0%;
+    
+    --error: 0 84.2% 60.2%;
+    --error-foreground: 210 40% 98%;
+    
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    
+    --radius: 0.5rem;
+  }
+
+  html, body {
+    @apply h-full antialiased scroll-smooth;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900 font-sans;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-medium tracking-tight;
+  }
+
+  h1 {
+    @apply text-3xl sm:text-4xl;
+  }
+
+  h2 {
+    @apply text-2xl sm:text-3xl;
+  }
+
+  h3 {
+    @apply text-xl sm:text-2xl;
+  }
+
+  h4 {
+    @apply text-lg sm:text-xl;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors 
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 
+           disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply bg-blue-500 text-white hover:bg-blue-600 focus-visible:ring-blue-500;
+  }
+
+  .btn-secondary {
+    @apply bg-teal-500 text-white hover:bg-teal-600 focus-visible:ring-teal-500;
+  }
+
+  .btn-accent {
+    @apply bg-amber-500 text-white hover:bg-amber-600 focus-visible:ring-amber-500;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent text-gray-700 hover:bg-gray-100 focus-visible:ring-gray-400;
+  }
+
+  .btn-sm {
+    @apply h-8 px-3 text-xs;
+  }
+
+  .btn-md {
+    @apply h-10 px-4;
+  }
+
+  .btn-lg {
+    @apply h-12 px-6 text-base;
+  }
+
+  .input {
+    @apply flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm 
+           placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 
+           focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .card {
+    @apply rounded-lg border bg-white shadow-sm transition-all hover:shadow-md;
+  }
+  
+  .table-container {
+    @apply w-full overflow-hidden overflow-x-auto rounded-lg border bg-white;
+  }
+
+  .table {
+    @apply w-full caption-bottom text-sm;
+  }
+
+  .table thead tr {
+    @apply border-b;
+  }
+
+  .table tbody tr {
+    @apply border-b hover:bg-gray-50;
+  }
+
+  .table th {
+    @apply h-12 px-4 text-left align-middle font-medium text-gray-500;
+  }
+
+  .table td {
+    @apply p-4 align-middle;
+  }
+}
