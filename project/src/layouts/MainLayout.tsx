@@ -61,7 +61,7 @@ const MainLayout = () => {
         <div className="flex h-16 items-center justify-between px-4 border-b">
           <Link to="/" className="flex items-center space-x-2">
             <BookOpen className="h-8 w-8 text-blue-500" />
-            <span className="text-xl font-semibold">LibraryMS</span>
+            <span className="text-xl font-semibold">Librium</span>
           </Link>
           <button 
             className="lg:hidden rounded-md p-2 text-gray-500 hover:bg-gray-100"
@@ -108,7 +108,7 @@ const MainLayout = () => {
                     <button
                       className="flex max-w-xs items-center rounded-md bg-gray-100 px-3 py-2 text-sm"
                     >
-                      <span className="text-gray-700">Admin User</span>
+                      <span className="text-gray-700">Администратор</span>
                       <ChevronDown className="ml-1 h-4 w-4 text-gray-500" />
                     </button>
                   </div>

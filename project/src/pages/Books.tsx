@@ -5,6 +5,7 @@ import {
   BookOpen, Trash, PenSquare 
 } from 'lucide-react';
 import api from '../services/api';
+import toast from 'react-hot-toast';
 
 interface Book {
   id: number;
@@ -23,47 +24,42 @@ const Books = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [openBookForm, setOpenBookForm] = useState(false);
+  const [showBookForm, setShowBookForm] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const itemsPerPage = 10;
 
   useEffect(() => {
-    const fetchBooks = async () => {
-      setIsLoading(true);
-      try {
-        // In a real app, we would fetch from the API
-        // const response = await api.get('/api/Books');
-        // setBooks(response.data);
-        
-        // For demo purposes, we're using mock data
-        setTimeout(() => {
-          const mockBooks = [
-            { id: 1, title: 'The Great Gatsby', isbn: '9780743273565', publishDate: '1925-04-10', addmissionDate: '2024-01-15', quantity: 5, rating: 4.5, authorIds: [1] },
-            { id: 2, title: 'To Kill a Mockingbird', isbn: '9780061120084', publishDate: '1960-07-11', addmissionDate: '2024-01-15', quantity: 3, rating: 4.8, authorIds: [2] },
-            { id: 3, title: '1984', isbn: '9780451524935', publishDate: '1949-06-08', addmissionDate: '2024-01-16', quantity: 7, rating: 4.6, authorIds: [3] },
-            { id: 4, title: 'Pride and Prejudice', isbn: '9780141439518', publishDate: '1813-01-28', addmissionDate: '2024-01-16', quantity: 4, rating: 4.7, authorIds: [4] },
-            { id: 5, title: 'The Hobbit', isbn: '9780618260300', publishDate: '1937-09-21', addmissionDate: '2024-01-17', quantity: 6, rating: 4.9, authorIds: [5] },
-            { id: 6, title: 'Animal Farm', isbn: '9780451526342', publishDate: '1945-08-17', addmissionDate: '2024-01-18', quantity: 5, rating: 4.3, authorIds: [3] },
-            { id: 7, title: 'The Catcher in the Rye', isbn: '9780316769488', publishDate: '1951-07-16', addmissionDate: '2024-01-19', quantity: 3, rating: 4.1, authorIds: [6] },
-            { id: 8, title: 'Lord of the Flies', isbn: '9780399501487', publishDate: '1954-09-17', addmissionDate: '2024-01-20', quantity: 4, rating: 4.0, authorIds: [7] },
-            { id: 9, title: 'The Grapes of Wrath', isbn: '9780143039433', publishDate: '1939-04-14', addmissionDate: '2024-01-21', quantity: 2, rating: 4.4, authorIds: [8] },
-            { id: 10, title: 'Brave New World', isbn: '9780060850524', publishDate: '1932-01-01', addmissionDate: '2024-01-22', quantity: 5, rating: 4.2, authorIds: [9] },
-            { id: 11, title: 'The Odyssey', isbn: '9780140268867', publishDate: '1800-01-01', addmissionDate: '2024-01-23', quantity: 3, rating: 4.7, authorIds: [10] },
-            { id: 12, title: 'Frankenstein', isbn: '9780486282114', publishDate: '1818-01-01', addmissionDate: '2024-01-24', quantity: 4, rating: 4.3, authorIds: [11] },
-          ];
-          
-          setBooks(mockBooks);
-          setFilteredBooks(mockBooks);
-          setIsLoading(false);
-        }, 500);
-        
-      } catch (error) {
-        console.error('Error fetching books:', error);
-        setIsLoading(false);
-      }
-    };
-
     fetchBooks();
   }, []);
+
+  const fetchBooks = async () => {
+    setIsLoading(true);
+    try {
+      const response = await api.get('/api/Books');
+      setBooks(response.data);
+      setFilteredBooks(response.data);
+    } catch (error) {
+      console.error('Error fetching books:', error);
+      toast.error('Failed to load books');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteBook = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this book?')) {
+      return;
+    }
+
+    try {
+      await api.delete(`/api/Books/${id}`);
+      toast.success('Book deleted successfully');
+      fetchBooks(); // Refresh the list
+    } catch (error) {
+      console.error('Error deleting book:', error);
+      toast.error('Failed to delete book');
+    }
+  };
 
   // Apply search filter
   useEffect(() => {
@@ -102,7 +98,7 @@ const Books = () => {
           <p className="text-gray-600 mt-1">Manage your library books</p>
         </div>
         <button
-          onClick={() => setOpenBookForm(true)}
+          onClick={() => setShowBookForm(true)}
           className="btn btn-primary btn-md mt-4 sm:mt-0"
         >
           <Plus className="mr-2 h-4 w-4" /> Add Book
@@ -121,7 +117,10 @@ const Books = () => {
               className="input pl-9"
             />
           </div>
-          <button className="btn btn-ghost btn-md border border-gray-200">
+          <button 
+            onClick={() => setShowFilters(!showFilters)}
+            className={`btn ${showFilters ? 'btn-accent' : 'btn-ghost'} btn-md border border-gray-200`}
+          >
             <Filter className="mr-2 h-4 w-4" /> Filter
           </button>
         </div>
@@ -188,7 +187,10 @@ const Books = () => {
                           >
                             <PenSquare className="h-4 w-4 text-blue-600" />
                           </Link>
-                          <button className="btn btn-ghost btn-sm p-1">
+                          <button 
+                            onClick={() => handleDeleteBook(book.id)}
+                            className="btn btn-ghost btn-sm p-1"
+                          >
                             <Trash className="h-4 w-4 text-red-600" />
                           </button>
                         </div>

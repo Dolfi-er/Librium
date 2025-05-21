@@ -38,105 +38,66 @@ const Transmissions = () => {
   const itemsPerPage = 10;
 
   useEffect(() => {
-    const fetchTransmissionsAndStatuses = async () => {
-      setIsLoading(true);
-      try {
-        // In a real app, we would fetch from the API
-        // const transmissionsResponse = await api.get('/api/Transmission');
-        // const statusesResponse = await api.get('/api/Status');
-        
-        // For demo purposes, we're using mock data
-        setTimeout(() => {
-          const mockStatuses = [
-            { id: 1, statusName: 'Active' },
-            { id: 2, statusName: 'Returned' },
-            { id: 3, statusName: 'Overdue' },
-            { id: 4, statusName: 'Lost' },
-          ];
-          
-          const mockTransmissions = [
-            { 
-              bookId: 1, 
-              userId: 1, 
-              issuanceDate: '2025-07-01', 
-              dueDate: '2025-07-15', 
-              statusId: 1, 
-              bookTitle: 'The Great Gatsby', 
-              userLogin: 'john.doe', 
-              statusName: 'Active' 
-            },
-            { 
-              bookId: 2, 
-              userId: 2, 
-              issuanceDate: '2025-06-15', 
-              dueDate: '2025-06-29', 
-              statusId: 2, 
-              bookTitle: 'To Kill a Mockingbird', 
-              userLogin: 'jane.smith', 
-              statusName: 'Returned' 
-            },
-            { 
-              bookId: 3, 
-              userId: 3, 
-              issuanceDate: '2025-06-20', 
-              dueDate: '2025-07-04', 
-              statusId: 3, 
-              bookTitle: '1984', 
-              userLogin: 'robert.johnson', 
-              statusName: 'Overdue' 
-            },
-            { 
-              bookId: 4, 
-              userId: 4, 
-              issuanceDate: '2025-06-25', 
-              dueDate: '2025-07-09', 
-              statusId: 1, 
-              bookTitle: 'Pride and Prejudice', 
-              userLogin: 'emily.williams', 
-              statusName: 'Active' 
-            },
-            { 
-              bookId: 5, 
-              userId: 5, 
-              issuanceDate: '2025-06-10', 
-              dueDate: '2025-06-24', 
-              statusId: 4, 
-              bookTitle: 'The Hobbit', 
-              userLogin: 'michael.brown', 
-              statusName: 'Lost' 
-            },
-            { 
-              bookId: 6, 
-              userId: 1, 
-              issuanceDate: '2025-06-05', 
-              dueDate: '2025-06-19', 
-              statusId: 3, 
-              bookTitle: 'Animal Farm', 
-              userLogin: 'john.doe', 
-              statusName: 'Overdue' 
-            },
-          ];
-          
-          setStatuses(mockStatuses);
-          setTransmissions(mockTransmissions);
-          setFilteredTransmissions(mockTransmissions);
-          setIsLoading(false);
-          
-          // Check if URL has filter=overdue parameter
-          const params = new URLSearchParams(location.search);
-          if (params.get('filter') === 'overdue') {
-            setShowOverdueOnly(true);
-          }
-        }, 500);
-        
-      } catch (error) {
-        console.error('Error fetching transmissions:', error);
-        setIsLoading(false);
-      }
-    };
-
     fetchTransmissionsAndStatuses();
-  }, [location.search]);
+  }, []);
+
+  const fetchTransmissionsAndStatuses = async () => {
+    setIsLoading(true);
+    try {
+      const [transmissionsResponse, statusesResponse] = await Promise.all([
+        api.get('/api/Transmission'),
+        api.get('/api/Status')
+      ]);
+      setTransmissions(transmissionsResponse.data);
+      setFilteredTransmissions(transmissionsResponse.data);
+      setStatuses(statusesResponse.data);
+
+      // Check if URL has filter=overdue parameter
+      const params = new URLSearchParams(location.search);
+      if (params.get('filter') === 'overdue') {
+        setShowOverdueOnly(true);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast.error('Failed to load transmissions');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteTransmission = async (bookId: number, userId: number) => {
+    if (!confirm('Are you sure you want to delete this transmission?')) {
+      return;
+    }
+
+    try {
+      await api.delete(`/api/Transmission/${bookId}/${userId}`);
+      toast.success('Transmission deleted successfully');
+      fetchTransmissionsAndStatuses(); // Refresh the list
+    } catch (error) {
+      console.error('Error deleting transmission:', error);
+      toast.error('Failed to delete transmission');
+    }
+  };
+
+  const handleMarkAsReturned = async (transmission: Transmission) => {
+    try {
+      const returnedStatusId = statuses.find(s => s.statusName === 'Returned')?.id;
+      if (!returnedStatusId) {
+        throw new Error('Returned status not found');
+      }
+
+      await api.put(`/api/Transmission/${transmission.bookId}/${transmission.userId}`, {
+        statusId: returnedStatusId
+      });
+
+      toast.success('Book marked as returned');
+      fetchTransmissionsAndStatuses(); // Refresh the list
+    } catch (error) {
+      console.error('Error updating transmission:', error);
+      toast.error('Failed to mark book as returned');
+    }
+  };
 
   // Apply filters
   useEffect(() => {
@@ -307,6 +268,7 @@ const Transmissions = () => {
                         <div className="flex space-x-2">
                           {transmission.statusName === 'Active' && (
                             <button
+                              onClick={() => handleMarkAsReturned(transmission)}
                               title="Mark as Returned"
                               className="btn btn-ghost btn-sm p-1"
                             >
@@ -314,6 +276,7 @@ const Transmissions = () => {
                             </button>
                           )}
                           <button
+                            onClick={() => handleDeleteTransmission(transmission.bookId, transmission.userId)}
                             className="btn btn-ghost btn-sm p-1"
                           >
                             <Trash className="h-4 w-4 text-red-600" />

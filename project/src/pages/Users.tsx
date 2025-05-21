@@ -34,106 +34,51 @@ const Users = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [roleFilter, setRoleFilter] = useState<number | null>(null);
+  const [showUserForm, setShowUserForm] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
   const itemsPerPage = 10;
 
   useEffect(() => {
-    const fetchUsersAndRoles = async () => {
-      setIsLoading(true);
-      try {
-        // In a real app, we would fetch from the API
-        // const usersResponse = await api.get('/api/User');
-        // const rolesResponse = await api.get('/api/Role');
-        
-        // For demo purposes, we're using mock data
-        setTimeout(() => {
-          const mockRoles = [
-            { id: 1, name: 'Admin' },
-            { id: 2, name: 'Librarian' },
-            { id: 3, name: 'Reader' },
-          ];
-          
-          const mockUsers = [
-            { 
-              id: 1, 
-              login: 'john.doe',
-              role: mockRoles[0],
-              info: {
-                fio: 'John Doe',
-                phone: '+1 234 567 8901',
-                ticketNumber: 'LIB-001',
-                birthday: '1985-06-15',
-                education: 'Master\'s Degree',
-                hallId: 1,
-              }
-            },
-            { 
-              id: 2, 
-              login: 'jane.smith',
-              role: mockRoles[1],
-              info: {
-                fio: 'Jane Smith',
-                phone: '+1 234 567 8902',
-                ticketNumber: 'LIB-002',
-                birthday: '1990-03-22',
-                education: 'Bachelor\'s Degree',
-                hallId: 1,
-              }
-            },
-            { 
-              id: 3, 
-              login: 'robert.johnson',
-              role: mockRoles[2],
-              info: {
-                fio: 'Robert Johnson',
-                phone: '+1 234 567 8903',
-                ticketNumber: 'LIB-003',
-                birthday: '1988-11-10',
-                education: 'PhD',
-                hallId: 2,
-              }
-            },
-            { 
-              id: 4, 
-              login: 'emily.williams',
-              role: mockRoles[2],
-              info: {
-                fio: 'Emily Williams',
-                phone: '+1 234 567 8904',
-                ticketNumber: 'LIB-004',
-                birthday: '1992-04-25',
-                education: 'Bachelor\'s Degree',
-                hallId: 2,
-              }
-            },
-            { 
-              id: 5, 
-              login: 'michael.brown',
-              role: mockRoles[1],
-              info: {
-                fio: 'Michael Brown',
-                phone: '+1 234 567 8905',
-                ticketNumber: 'LIB-005',
-                birthday: '1982-08-30',
-                education: 'Master\'s Degree',
-                hallId: 1,
-              }
-            },
-          ];
-          
-          setRoles(mockRoles);
-          setUsers(mockUsers);
-          setFilteredUsers(mockUsers);
-          setIsLoading(false);
-        }, 500);
-        
-      } catch (error) {
-        console.error('Error fetching users:', error);
-        setIsLoading(false);
-      }
-    };
-
     fetchUsersAndRoles();
   }, []);
+
+  const fetchUsersAndRoles = async () => {
+    setIsLoading(true);
+    try {
+      const [usersResponse, rolesResponse] = await Promise.all([
+        api.get('/api/User'),
+        api.get('/api/Role')
+      ]);
+      setUsers(usersResponse.data);
+      setFilteredUsers(usersResponse.data);
+      setRoles(rolesResponse.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast.error('Failed to load users');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteUser = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this user?')) {
+      return;
+    }
+
+    try {
+      await api.delete(`/api/User/${id}`);
+      toast.success('User deleted successfully');
+      fetchUsersAndRoles(); // Refresh the list
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      toast.error('Failed to delete user');
+    }
+  };
+
+  const handleEditUser = (user: User) => {
+    setEditingUser(user);
+    setShowUserForm(true);
+  };
 
   // Apply filters
   useEffect(() => {
@@ -176,6 +121,10 @@ const Users = () => {
           <p className="text-gray-600 mt-1">Manage library users and staff</p>
         </div>
         <button
+          onClick={() => {
+            setEditingUser(null);
+            setShowUserForm(true);
+          }}
           className="btn btn-primary btn-md mt-4 sm:mt-0"
         >
           <Plus className="mr-2 h-4 w-4" /> Add User
@@ -281,11 +230,13 @@ const Users = () => {
                       <td>
                         <div className="flex space-x-2">
                           <button
+                            onClick={() => handleEditUser(user)}
                             className="btn btn-ghost btn-sm p-1"
                           >
                             <PenSquare className="h-4 w-4 text-blue-600" />
                           </button>
                           <button
+                            onClick={() => handleDeleteUser(user.id)}
                             className="btn btn-ghost btn-sm p-1"
                           >
                             <Trash className="h-4 w-4 text-red-600" />
