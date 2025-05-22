@@ -15,6 +15,7 @@ import BookDetails from './pages/BookDetails';
 import Authors from './pages/Authors';
 import Users from './pages/Users';
 import Transmissions from './pages/Transmissions';
+import Halls from './pages/Halls';
 import NotFound from './pages/NotFound';
 
 // Protected route component
@@ -50,6 +51,7 @@ function App() {
           <Route path="authors" element={<Authors />} />
           <Route path="users" element={<Users />} />
           <Route path="transmissions" element={<Transmissions />} />
+          <Route path="halls" element={<Halls />} />
         </Route>
         
         {/* Fallback routes */}

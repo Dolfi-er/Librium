@@ -56,63 +56,20 @@ const BookDetails = () => {
     const fetchBookDetails = async () => {
       setIsLoading(true);
       try {
-        // In a real app, we would fetch from the API
-        // const bookResponse = await api.get(`/api/Books/${id}`);
-        // const authorsResponse = await api.get('/api/Authors');
-        // const transmissionsResponse = await api.get(`/api/Transmission/book/${id}`);
+        const [bookResponse, authorsResponse, transmissionsResponse] = await Promise.all([
+          api.get(`/api/Books/${id}`),
+          api.get('/api/Authors'),
+          api.get(`/api/Transmission/book/${id}`)
+        ]);
         
-        // For demo purposes, we're using mock data
-        setTimeout(() => {
-          const mockBook = {
-            id: Number(id),
-            title: 'The Great Gatsby',
-            isbn: '9780743273565',
-            publishDate: '1925-04-10',
-            addmissionDate: '2024-01-15',
-            quantity: 5,
-            rating: 4.5,
-            authorIds: [1]
-          };
-          
-          const mockAuthors = [
-            { id: 1, authorName: 'F. Scott Fitzgerald' },
-            { id: 2, authorName: 'Harper Lee' },
-            { id: 3, authorName: 'George Orwell' },
-          ];
-          
-          const mockTransmissions = [
-            { 
-              bookId: Number(id), 
-              userId: 1, 
-              issuanceDate: '2025-07-01', 
-              dueDate: '2025-07-15', 
-              statusId: 1, 
-              bookTitle: 'The Great Gatsby', 
-              userLogin: 'john.doe', 
-              statusName: 'Active' 
-            },
-            { 
-              bookId: Number(id), 
-              userId: 2, 
-              issuanceDate: '2025-06-15', 
-              dueDate: '2025-06-29', 
-              statusId: 2, 
-              bookTitle: 'The Great Gatsby', 
-              userLogin: 'jane.smith', 
-              statusName: 'Returned' 
-            },
-          ];
-          
-          setBook(mockBook);
-          setFormData(mockBook);
-          setAuthors(mockAuthors);
-          setTransmissions(mockTransmissions);
-          setIsLoading(false);
-        }, 500);
-        
+        setBook(bookResponse.data);
+        setFormData(bookResponse.data);
+        setAuthors(authorsResponse.data);
+        setTransmissions(transmissionsResponse.data);
       } catch (error) {
         console.error('Error fetching book details:', error);
         toast.error('Failed to load book details');
+      } finally {
         setIsLoading(false);
       }
     };
@@ -154,6 +111,21 @@ const BookDetails = () => {
     } catch (error) {
       console.error('Error updating book:', error);
       toast.error('Failed to update book');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!confirm('Are you sure you want to delete this book?')) {
+      return;
+    }
+
+    try {
+      await api.delete(`/api/Books/${id}`);
+      toast.success('Book deleted successfully');
+      navigate('/books');
+    } catch (error) {
+      console.error('Error deleting book:', error);
+      toast.error('Failed to delete book');
     }
   };
 
@@ -227,7 +199,10 @@ const BookDetails = () => {
               >
                 Edit Book
               </button>
-              <button className="btn btn-ghost btn-md text-red-600 border border-gray-200">
+              <button 
+                onClick={handleDelete}
+                className="btn btn-ghost btn-md text-red-600 border border-gray-200"
+              >
                 <Trash className="mr-2 h-4 w-4" /> Delete
               </button>
             </>
@@ -236,7 +211,6 @@ const BookDetails = () => {
       </div>
 
       {isEditing ? (
-        // Edit form
         <div className="card p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -352,10 +326,8 @@ const BookDetails = () => {
           </form>
         </div>
       ) : (
-        // Book details view
         <>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Book Info */}
             <div className="md:col-span-2">
               <div className="card p-6">
                 <h2 className="text-xl font-medium mb-4">Book Information</h2>
@@ -424,7 +396,6 @@ const BookDetails = () => {
               </div>
             </div>
 
-            {/* Actions Card */}
             <div>
               <div className="card p-6">
                 <h2 className="text-xl font-medium mb-4">Quick Actions</h2>
@@ -443,7 +414,6 @@ const BookDetails = () => {
             </div>
           </div>
 
-          {/* Transmission History */}
           <div className="mt-6">
             <h2 className="text-xl font-medium mb-4">Loan History</h2>
             

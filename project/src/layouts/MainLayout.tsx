@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Outlet, useLocation, Link } from 'react-router-dom';
 import { 
-  BookOpen, Users, BookCopy, User, LayoutDashboard, 
+  BookOpen, LampDesk, Users, BookCopy, User, LayoutDashboard, 
   LogOut, Menu, X, BookMarked, ChevronDown 
 } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
@@ -17,6 +17,7 @@ const MainLayout = () => {
     { name: 'Авторы', href: '/authors', icon: BookMarked },
     { name: 'Пользователи', href: '/users', icon: User },
     { name: 'Книговыдача', href: '/transmissions', icon: BookCopy },
+    { name: 'Залы', href: '/halls', icon: LampDesk },
   ];
 
   // Close sidebar when clicking outside on mobile
