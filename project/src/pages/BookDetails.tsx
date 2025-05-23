@@ -105,27 +105,27 @@ const BookDetails = () => {
       if (book) {
         const updatedBook = { ...book, ...formData };
         setBook(updatedBook);
-        toast.success('Book updated successfully');
+        toast.success('Книга обновлена');
         setIsEditing(false);
       }
     } catch (error) {
       console.error('Error updating book:', error);
-      toast.error('Failed to update book');
+      toast.error('Не удалось обновить книгу');
     }
   };
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this book?')) {
+    if (!confirm('Вы уверены, что хотите удалить эту книгу?')) {
       return;
     }
 
     try {
       await api.delete(`/api/Books/${id}`);
-      toast.success('Book deleted successfully');
+      toast.success('Книга удалена');
       navigate('/books');
     } catch (error) {
       console.error('Error deleting book:', error);
-      toast.error('Failed to delete book');
+      toast.error('Не удалось удалить книгу');
     }
   };
 
@@ -156,10 +156,10 @@ const BookDetails = () => {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
         <BookOpen className="h-12 w-12 text-gray-400 mb-4" />
-        <h3 className="text-lg font-medium text-gray-700">Book not found</h3>
-        <p className="text-gray-500 mt-2">The book you're looking for doesn't exist or has been removed.</p>
+        <h3 className="text-lg font-medium text-gray-700">Книга не найдена</h3>
+        <p className="text-gray-500 mt-2">Книга, которую вы ищете, не существует или была удалена.</p>
         <Link to="/books" className="btn btn-primary btn-md mt-6">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Books
+          <ArrowLeft className="mr-2 h-4 w-4" /> Вернуться к книгам
         </Link>
       </div>
     );
@@ -169,7 +169,7 @@ const BookDetails = () => {
     <div className="animate-fadeIn">
       <div className="mb-6">
         <Link to="/books" className="text-blue-600 hover:text-blue-800 inline-flex items-center">
-          <ArrowLeft className="mr-1 h-4 w-4" /> Back to Books
+          <ArrowLeft className="mr-1 h-4 w-4" /> Вернуться к книгам
         </Link>
       </div>
 
@@ -182,13 +182,13 @@ const BookDetails = () => {
                 onClick={() => setIsEditing(false)}
                 className="btn btn-ghost btn-md border border-gray-200"
               >
-                Cancel
+                Отменить
               </button>
               <button
                 onClick={handleSubmit}
                 className="btn btn-primary btn-md"
               >
-                <Save className="mr-2 h-4 w-4" /> Save Changes
+                <Save className="mr-2 h-4 w-4" /> Сохранить изменения
               </button>
             </>
           ) : (
@@ -197,13 +197,13 @@ const BookDetails = () => {
                 onClick={() => setIsEditing(true)}
                 className="btn btn-primary btn-md"
               >
-                Edit Book
+                Редактировать книгу
               </button>
               <button 
                 onClick={handleDelete}
                 className="btn btn-ghost btn-md text-red-600 border border-gray-200"
               >
-                <Trash className="mr-2 h-4 w-4" /> Delete
+                <Trash className="mr-2 h-4 w-4" /> Удалить
               </button>
             </>
           )}
@@ -216,7 +216,7 @@ const BookDetails = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-                  Title
+                  Название
                 </label>
                 <input
                   id="title"
@@ -246,7 +246,7 @@ const BookDetails = () => {
               
               <div>
                 <label htmlFor="publishDate" className="block text-sm font-medium text-gray-700 mb-1">
-                  Publish Date
+                  Дата публикации
                 </label>
                 <input
                   id="publishDate"
@@ -260,7 +260,7 @@ const BookDetails = () => {
               
               <div>
                 <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 mb-1">
-                  Quantity
+                  Количество
                 </label>
                 <input
                   id="quantity"
@@ -276,7 +276,7 @@ const BookDetails = () => {
               
               <div>
                 <label htmlFor="rating" className="block text-sm font-medium text-gray-700 mb-1">
-                  Rating
+                  Рейтинг
                 </label>
                 <input
                   id="rating"
@@ -294,7 +294,7 @@ const BookDetails = () => {
               
               <div>
                 <label htmlFor="authorIds" className="block text-sm font-medium text-gray-700 mb-1">
-                  Authors
+                  Автор(ы)
                 </label>
                 <select
                   id="authorIds"
@@ -311,7 +311,7 @@ const BookDetails = () => {
                     </option>
                   ))}
                 </select>
-                <p className="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple authors</p>
+                <p className="text-xs text-gray-500 mt-1">Зажмите Ctrl/Cmd для выбора нескольких авторов</p>
               </div>
             </div>
             
@@ -320,7 +320,7 @@ const BookDetails = () => {
                 type="submit"
                 className="btn btn-primary btn-md"
               >
-                <Save className="mr-2 h-4 w-4" /> Save Changes
+                <Save className="mr-2 h-4 w-4" /> Сохранить изменения
               </button>
             </div>
           </form>
@@ -330,13 +330,13 @@ const BookDetails = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-2">
               <div className="card p-6">
-                <h2 className="text-xl font-medium mb-4">Book Information</h2>
+                <h2 className="text-xl font-medium mb-4">Информация о книге</h2>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6">
                   <div className="flex items-start">
                     <BookOpen className="h-5 w-5 text-blue-500 mt-0.5 mr-3" />
                     <div>
-                      <p className="text-sm text-gray-500">Title</p>
+                      <p className="text-sm text-gray-500">Название</p>
                       <p className="font-medium">{book.title}</p>
                     </div>
                   </div>
@@ -344,7 +344,7 @@ const BookDetails = () => {
                   <div className="flex items-start">
                     <Bookmark className="h-5 w-5 text-blue-500 mt-0.5 mr-3" />
                     <div>
-                      <p className="text-sm text-gray-500">Author</p>
+                      <p className="text-sm text-gray-500">Автор(ы)</p>
                       <p className="font-medium">{getAuthorNames()}</p>
                     </div>
                   </div>
@@ -360,7 +360,7 @@ const BookDetails = () => {
                   <div className="flex items-start">
                     <Star className="h-5 w-5 text-amber-400 mt-0.5 mr-3" />
                     <div>
-                      <p className="text-sm text-gray-500">Rating</p>
+                      <p className="text-sm text-gray-500">Рейтинг</p>
                       <p className="font-medium">{book.rating.toFixed(1)}</p>
                     </div>
                   </div>
@@ -368,7 +368,7 @@ const BookDetails = () => {
                   <div className="flex items-start">
                     <Calendar className="h-5 w-5 text-blue-500 mt-0.5 mr-3" />
                     <div>
-                      <p className="text-sm text-gray-500">Publish Date</p>
+                      <p className="text-sm text-gray-500">Дата публикации</p>
                       <p className="font-medium">
                         {book.publishDate 
                           ? new Date(book.publishDate).toLocaleDateString() 
@@ -380,7 +380,7 @@ const BookDetails = () => {
                   <div className="flex items-start">
                     <Clock className="h-5 w-5 text-blue-500 mt-0.5 mr-3" />
                     <div>
-                      <p className="text-sm text-gray-500">Added to Library</p>
+                      <p className="text-sm text-gray-500">Добавить в библиотеку</p>
                       <p className="font-medium">{new Date(book.addmissionDate).toLocaleDateString()}</p>
                     </div>
                   </div>
@@ -388,7 +388,7 @@ const BookDetails = () => {
                   <div className="flex items-start">
                     <Package className="h-5 w-5 text-blue-500 mt-0.5 mr-3" />
                     <div>
-                      <p className="text-sm text-gray-500">Quantity</p>
+                      <p className="text-sm text-gray-500">Количество</p>
                       <p className="font-medium">{book.quantity}</p>
                     </div>
                   </div>
@@ -398,16 +398,16 @@ const BookDetails = () => {
 
             <div>
               <div className="card p-6">
-                <h2 className="text-xl font-medium mb-4">Quick Actions</h2>
+                <h2 className="text-xl font-medium mb-4">Быстрые действия</h2>
                 <div className="space-y-3">
                   <button className="btn btn-primary btn-md w-full justify-start">
                     <Users className="mr-2 h-5 w-5" />
-                    Issue Book
+                    Выдать книгу
                   </button>
                   
                   <Link to="/transmissions" className="btn btn-secondary btn-md w-full justify-start">
                     <Clock className="mr-2 h-5 w-5" />
-                    View Loan History
+                    Просмотр истории выдачи
                   </Link>
                 </div>
               </div>
@@ -415,21 +415,21 @@ const BookDetails = () => {
           </div>
 
           <div className="mt-6">
-            <h2 className="text-xl font-medium mb-4">Loan History</h2>
+            <h2 className="text-xl font-medium mb-4">История выдачи</h2>
             
             {transmissions.length === 0 ? (
               <div className="card p-6 text-center">
-                <p className="text-gray-500">No loan history for this book.</p>
+                <p className="text-gray-500">У этой книги нет истории выдачи.</p>
               </div>
             ) : (
               <div className="table-container">
                 <table className="table">
                   <thead>
                     <tr>
-                      <th>User</th>
-                      <th>Issued Date</th>
-                      <th>Due Date</th>
-                      <th>Status</th>
+                      <th>Пользователь</th>
+                      <th>Дата выдачи</th>
+                      <th>Дата возврата</th>
+                      <th>Статус</th>
                     </tr>
                   </thead>
                   <tbody>
