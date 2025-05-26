@@ -77,7 +77,7 @@ const Users = () => {
       setRoles(rolesResponse.data);
     } catch (error) {
       console.error('Error fetching data:', error);
-      toast.error('Failed to load users');
+      toast.error('Не удалось загрузить пользователей');
     } finally {
       setIsLoading(false);
     }
@@ -93,17 +93,17 @@ const Users = () => {
   };
 
   const handleDeleteUser = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this user?')) {
+    if (!confirm('Вы уверенны, что хотите удалить пользователя?')) {
       return;
     }
 
     try {
       await api.delete(`/api/User/${id}`);
-      toast.success('User deleted successfully');
+      toast.success('Пользователь удален');
       fetchUsersAndRoles(); // Refresh the list
     } catch (error) {
       console.error('Error deleting user:', error);
-      toast.error('Failed to delete user');
+      toast.error('Не удалось удалить пользователя');
     }
   };
 
@@ -125,10 +125,10 @@ const Users = () => {
     try {
       if (editingUser) {
         await api.put(`/api/User/${editingUser.id}`, formData);
-        toast.success('User updated successfully');
+        toast.success('Пользователь обновлен');
       } else {
         await api.post('/api/User', formData);
-        toast.success('User added successfully');
+        toast.success('Пользователь добавлен');
       }
       
       setShowUserForm(false);
@@ -143,7 +143,7 @@ const Users = () => {
       fetchUsersAndRoles();
     } catch (error) {
       console.error('Error saving user:', error);
-      toast.error('Failed to save user');
+      toast.error('Не удалось сохранить пользователя');
     }
   };
 
@@ -184,8 +184,8 @@ const Users = () => {
     <div className="animate-fadeIn">
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-bold text-gray-900">Users</h1>
-          <p className="text-gray-600 mt-1">Manage library users and staff</p>
+          <h1 className="font-bold text-gray-900">Пользователи</h1>
+          <p className="text-gray-600 mt-1">Управление пользователями системы</p>
         </div>
         <button
           onClick={() => {
@@ -194,7 +194,7 @@ const Users = () => {
           }}
           className="btn btn-primary btn-md mt-4 sm:mt-0"
         >
-          <Plus className="mr-2 h-4 w-4" /> Add User
+          <Plus className="mr-2 h-4 w-4" /> Добавить пользователя
         </button>
       </div>
 
@@ -217,7 +217,7 @@ const Users = () => {
               onChange={(e) => setRoleFilter(e.target.value ? Number(e.target.value) : null)}
               className="input"
             >
-              <option value="">All Roles</option>
+              <option value="">Добавить роль</option>
               {roles.map(role => (
                 <option key={role.id} value={role.id}>{role.name}</option>
               ))}
@@ -228,7 +228,7 @@ const Users = () => {
                 onClick={clearFilters}
                 className="btn btn-ghost btn-md border border-gray-200"
               >
-                <X className="mr-2 h-4 w-4" /> Clear Filters
+                <X className="mr-2 h-4 w-4" /> Очистить фильтры
               </button>
             )}
           </div>
@@ -249,18 +249,18 @@ const Users = () => {
             {filteredUsers.length === 0 ? (
               <div className="flex flex-col items-center justify-center p-8 text-center">
                 <UserCircle className="h-12 w-12 text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-700">No users found</h3>
+                <h3 className="text-lg font-medium text-gray-700">Пользователи не найдены</h3>
                 <p className="text-gray-500 mt-2">
                   {searchTerm.trim() !== '' || roleFilter !== null
-                    ? "No users match your search criteria"
-                    : "Your user list is empty. Add users to get started."}
+                    ? "Ни один пользователь не соответствует вашим критериям"
+                    : "Ваш список пользователей пуст. Добавьте пользователей, чтобы начать."}
                 </p>
                 {(searchTerm.trim() !== '' || roleFilter !== null) && (
                   <button
                     onClick={clearFilters}
                     className="btn btn-ghost btn-sm mt-4 text-blue-600"
                   >
-                    Clear filters
+                    Очистить фильтры
                   </button>
                 )}
               </div>
@@ -268,12 +268,12 @@ const Users = () => {
               <table className="table">
                 <thead>
                   <tr>
-                    <th>Name</th>
-                    <th>Login</th>
-                    <th className="hidden md:table-cell">Phone</th>
-                    <th>Role</th>
-                    <th className="hidden sm:table-cell">Ticket #</th>
-                    <th>Actions</th>
+                    <th>Имя</th>
+                    <th>Логин</th>
+                    <th className="hidden md:table-cell">Телефон</th>
+                    <th>Роль</th>
+                    <th className="hidden sm:table-cell">№ билета</th>
+                    <th>Управление</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -321,7 +321,7 @@ const Users = () => {
           {filteredUsers.length > 0 && (
             <div className="flex items-center justify-between my-6">
               <div className="text-sm text-gray-600">
-                Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredUsers.length)} of {filteredUsers.length} users
+                Показывается {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredUsers.length)} из {filteredUsers.length} пользователей
               </div>
               
               <div className="flex items-center space-x-2">
@@ -334,7 +334,7 @@ const Users = () => {
                 </button>
                 
                 <div className="text-sm font-medium">
-                  Page {currentPage} of {totalPages}
+                  Страница {currentPage} из {totalPages}
                 </div>
                 
                 <button
@@ -356,7 +356,7 @@ const Users = () => {
           <div className="bg-white rounded-lg p-6 w-full max-w-2xl animate-fadeIn">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-medium">
-                {editingUser ? 'Edit User' : 'Add New User'}
+                {editingUser ? 'Редактировать пользователя' : 'Добавить нового пользователя'}
               </h2>
               <button
                 onClick={() => {
@@ -373,7 +373,7 @@ const Users = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="login" className="block text-sm font-medium text-gray-700 mb-1">
-                    Login
+                    Логин
                   </label>
                   <input
                     id="login"
@@ -388,7 +388,7 @@ const Users = () => {
                 
                 <div>
                   <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                    Password
+                    Пароль
                   </label>
                   <input
                     id="password"
@@ -403,7 +403,7 @@ const Users = () => {
                 
                 <div>
                   <label htmlFor="fio" className="block text-sm font-medium text-gray-700 mb-1">
-                    Full Name
+                    ФИО
                   </label>
                   <input
                     id="fio"
@@ -418,7 +418,7 @@ const Users = () => {
                 
                 <div>
                   <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                    Phone
+                    Телефон
                   </label>
                   <input
                     id="phone"
@@ -433,7 +433,7 @@ const Users = () => {
                 
                 <div>
                   <label htmlFor="roleId" className="block text-sm font-medium text-gray-700 mb-1">
-                    Role
+                    Роль
                   </label>
                   <select
                     id="roleId"
@@ -453,7 +453,7 @@ const Users = () => {
                 
                 <div>
                   <label htmlFor="hallId" className="block text-sm font-medium text-gray-700 mb-1">
-                    Hall
+                    Зал
                   </label>
                   <select
                     id="hallId"
@@ -462,7 +462,7 @@ const Users = () => {
                     onChange={handleInputChange}
                     className="input"
                   >
-                    <option value="">Select a hall</option>
+                    <option value="">Выберите зал</option>
                     {halls.map(hall => (
                       <option key={hall.id} value={hall.id}>
                         {hall.hallName}
@@ -473,7 +473,7 @@ const Users = () => {
                 
                 <div>
                   <label htmlFor="ticketNumber" className="block text-sm font-medium text-gray-700 mb-1">
-                    Ticket Number
+                    Номер билета
                   </label>
                   <input
                     id="ticketNumber"
@@ -487,7 +487,7 @@ const Users = () => {
                 
                 <div>
                   <label htmlFor="birthday" className="block text-sm font-medium text-gray-700 mb-1">
-                    Birthday
+                    День рождения
                   </label>
                   <input
                     id="birthday"
@@ -501,7 +501,7 @@ const Users = () => {
                 
                 <div className="md:col-span-2">
                   <label htmlFor="education" className="block text-sm font-medium text-gray-700 mb-1">
-                    Education
+                    Образование
                   </label>
                   <input
                     id="education"
@@ -523,13 +523,13 @@ const Users = () => {
                   }}
                   className="btn btn-ghost btn-md border border-gray-200"
                 >
-                  Cancel
+                  Отмена
                 </button>
                 <button
                   type="submit"
                   className="btn btn-primary btn-md"
                 >
-                  {editingUser ? 'Update User' : 'Add User'}
+                  {editingUser ? 'Обновить пользователя' : 'Добавить пользователя'}
                 </button>
               </div>
             </form>

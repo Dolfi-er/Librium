@@ -174,7 +174,7 @@ const BookDetails = () => {
       </div>
 
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-        <h1 className="font-bold text-gray-900">{isEditing ? 'Edit Book' : book.title}</h1>
+        <h1 className="font-bold text-gray-900">{isEditing ? 'Редактирование книги' : book.title}</h1>
         <div className="flex items-center space-x-3 mt-4 md:mt-0">
           {isEditing ? (
             <>
