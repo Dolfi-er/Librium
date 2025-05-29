@@ -27,11 +27,11 @@ namespace Project.Backend.Data
             modelBuilder.Entity<WrittenByModel>()
                 .HasKey(w => new { w.BookId, w.AuthorId });
 
-            // Связи для UserModel
+            // Исправленная конфигурация для UserModel и InfoModel
             modelBuilder.Entity<UserModel>()
                 .HasOne(u => u.Info)
                 .WithOne(i => i.User)
-                .HasForeignKey<InfoModel>(i => i.Id)
+                .HasForeignKey<UserModel>(u => u.InfoId) // Внешний ключ в UserModel
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<UserModel>()

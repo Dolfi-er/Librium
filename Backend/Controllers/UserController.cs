@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Project.Backend.Controllers
 {
-    //[Authorize(Roles = "Админ")]
+    [Authorize(Roles = "Админ")]
     [ApiController]
     [Route("api/[controller]")]
     public class UserController : ControllerBase
@@ -208,11 +208,12 @@ namespace Project.Backend.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
+       [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
             var user = await _context.Users
                 .Include(u => u.Info)
+                .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null)
@@ -220,10 +221,24 @@ namespace Project.Backend.Controllers
                 return NotFound();
             }
 
+            // Проверка на удаление администратора
+            if (user.RoleId == 2) // Роль "Админ"
+            {
+                // Количество оставшихся администраторов
+                var adminCount = await _context.Users
+                    .CountAsync(u => u.RoleId == 2 && u.Id != id);
+                    
+                if (adminCount == 0)
+                {
+                    return BadRequest(new { 
+                        message = "Нельзя удалить последнего администратора системы" 
+                    });
+                }
+            }
+
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                // Удаление пользователя и каскадное удаление Info
                 _context.Users.Remove(user);
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();

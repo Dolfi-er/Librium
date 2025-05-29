@@ -3,9 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using Project.Backend.Data;
 using Project.Backend.Models;
 using Project.Backend.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Project.Backend.Controllers
 {
+    [Authorize(Roles = "Админ")]
+    [Authorize(Roles = "Библиотекарь")]
     [ApiController]
     [Route("api/[controller]")]
     public class StatusController : ControllerBase

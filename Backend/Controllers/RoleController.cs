@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Project.Backend.Controllers
 {   
-    //[Authorize(Roles = "Админ")]
+    [Authorize(Roles = "Админ")]
     [ApiController]
     [Route("api/[controller]")]
     public class RoleController : ControllerBase

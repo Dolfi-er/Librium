@@ -83,6 +83,23 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Применение миграций и инициализация данных
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<AppDBContext>();
+        context.Database.Migrate(); // Применяет миграции
+        await SeedData.Initialize(context, "1234"); // Заполняет начальные данные
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Ошибка при инициализации базы данных");
+    }
+}
+
 // Автоматическая привязка токена из куки
 app.Use(async (context, next) =>
 {
