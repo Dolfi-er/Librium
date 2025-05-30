@@ -24,18 +24,39 @@ interface Transmission {
   statusName: string;
 }
 
+interface Book {
+  id: number;
+  title: string;
+}
+
+interface User {
+  id: number;
+  login: string;
+}
+
 const Transmissions = () => {
   const location = useLocation();
   const [transmissions, setTransmissions] = useState<Transmission[]>([]);
   const [filteredTransmissions, setFilteredTransmissions] = useState<Transmission[]>([]);
   const [statuses, setStatuses] = useState<Status[]>([]);
+  const [books, setBooks] = useState<Book[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingBooks, setIsLoadingBooks] = useState(false);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<number | null>(null);
   const [showOverdueOnly, setShowOverdueOnly] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const itemsPerPage = 10;
+
+  const [issueForm, setIssueForm] = useState({
+    bookId: '',
+    userId: '',
+    issuanceDate: new Date().toISOString().split('T')[0],
+    dueDate: new Date(new Date().setDate(new Date().getDate() + 14)).toISOString().split('T')[0]
+  });
 
   useEffect(() => {
     fetchTransmissionsAndStatuses();
@@ -52,18 +73,51 @@ const Transmissions = () => {
       setFilteredTransmissions(transmissionsResponse.data);
       setStatuses(statusesResponse.data);
 
-      // Check if URL has filter=overdue parameter
       const params = new URLSearchParams(location.search);
       if (params.get('filter') === 'Задержана') {
         setShowOverdueOnly(true);
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
-      toast.error('Неудалось загрузить записи книговыдачи');
+      console.error('Ошибка загрузки данных:', error);
+      toast.error('Не удалось загрузить записи книговыдачи');
     } finally {
       setIsLoading(false);
     }
   };
+
+  const fetchBooksAndUsers = async () => {
+    try {
+      setIsLoadingBooks(true);
+      setIsLoadingUsers(true);
+      
+      const [booksResponse, usersResponse] = await Promise.all([
+        api.get('/api/Books'),
+        api.get('/api/User')
+      ]);
+      
+      setBooks(booksResponse.data.map((book: any) => ({
+        id: book.id,
+        title: book.title || 'Без названия'
+      })));
+      
+      setUsers(usersResponse.data.map((user: any) => ({
+        id: user.id,
+        login: user.login || 'Без логина'
+      })));
+    } catch (error) {
+      console.error('Ошибка загрузки данных:', error);
+      toast.error('Не удалось загрузить данные для выдачи');
+    } finally {
+      setIsLoadingBooks(false);
+      setIsLoadingUsers(false);
+    }
+  };
+
+  useEffect(() => {
+    if (showForm) {
+      fetchBooksAndUsers();
+    }
+  }, [showForm]);
 
   const handleDeleteTransmission = async (bookId: number, userId: number) => {
     if (!confirm('Вы уверены, что хотите удалить эту запись книговыдачи?')) {
@@ -73,29 +127,66 @@ const Transmissions = () => {
     try {
       await api.delete(`/api/Transmission/${bookId}/${userId}`);
       toast.success('Запись книговыдачи удалена');
-      fetchTransmissionsAndStatuses(); // Refresh the list
+      fetchTransmissionsAndStatuses();
     } catch (error) {
-      console.error('Error deleting transmission:', error);
+      console.error('Ошибка удаления записи:', error);
       toast.error('Не удалось удалить запись книговыдачи');
     }
   };
 
   const handleMarkAsReturned = async (transmission: Transmission) => {
     try {
-      const returnedStatusId = statuses.find(s => s.statusName === 'Returned')?.id;
-      if (!returnedStatusId) {
-        throw new Error('Returned status not found');
+      const returnedStatus = statuses.find(s => s.statusName === 'Возвращена');
+      if (!returnedStatus) {
+        throw new Error('Статус "Возвращена" не найден');
       }
 
       await api.put(`/api/Transmission/${transmission.bookId}/${transmission.userId}`, {
-        statusId: returnedStatusId
+        statusId: returnedStatus.id
       });
 
       toast.success('Книга отмечена как возвращенная');
-      fetchTransmissionsAndStatuses(); // Refresh the list
+      fetchTransmissionsAndStatuses();
     } catch (error) {
-      console.error('Error updating transmission:', error);
+      console.error('Ошибка обновления статуса:', error);
       toast.error('Не удалось отметить книгу как возвращенную');
+    }
+  };
+
+  const handleIssueSubmit = async () => {
+    if (!issueForm.bookId || !issueForm.userId) {
+      toast.error('Выберите книгу и пользователя');
+      return;
+    }
+
+    try {
+      const issuedStatus = statuses.find(s => s.statusName === 'Выдана');
+      if (!issuedStatus) {
+        throw new Error('Статус "Выдана" не найден');
+      }
+
+      const issueData = {
+        bookId: parseInt(issueForm.bookId),
+        userId: parseInt(issueForm.userId),
+        issuanceDate: `${issueForm.issuanceDate}T00:00:00Z`,
+        dueDate: `${issueForm.dueDate}T00:00:00Z`,
+        statusId: issuedStatus.id
+      };
+
+      await api.post('/api/Transmission', issueData);
+      
+      toast.success('Книга успешно выдана');
+      setShowForm(false);
+      setIssueForm({
+        bookId: '',
+        userId: '',
+        issuanceDate: new Date().toISOString().split('T')[0],
+        dueDate: new Date(new Date().setDate(new Date().getDate() + 14)).toISOString().split('T')[0]
+      });
+      fetchTransmissionsAndStatuses();
+    } catch (error) {
+      console.error('Ошибка выдачи книги:', error);
+      toast.error('Не удалось выдать книгу');
     }
   };
 
@@ -103,7 +194,6 @@ const Transmissions = () => {
   useEffect(() => {
     let filtered = [...transmissions];
     
-    // Apply search filter
     if (searchTerm.trim() !== '') {
       filtered = filtered.filter(transmission => 
         transmission.bookTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -111,18 +201,16 @@ const Transmissions = () => {
       );
     }
     
-    // Apply status filter
     if (statusFilter !== null) {
       filtered = filtered.filter(transmission => transmission.statusId === statusFilter);
     }
     
-    // Apply overdue filter
     if (showOverdueOnly) {
-      filtered = filtered.filter(transmission => transmission.statusName === 'Overdue');
+      filtered = filtered.filter(transmission => transmission.statusName === 'Задержана');
     }
     
     setFilteredTransmissions(filtered);
-    setCurrentPage(1); // Reset to first page on filter change
+    setCurrentPage(1);
   }, [searchTerm, statusFilter, showOverdueOnly, transmissions]);
 
   // Calculate pagination
@@ -269,7 +357,7 @@ const Transmissions = () => {
                           {transmission.statusName === 'Выдана' && (
                             <button
                               onClick={() => handleMarkAsReturned(transmission)}
-                              title="Mark as Returned"
+                              title="Отметить как возвращенную"
                               className="btn btn-ghost btn-sm p-1"
                             >
                               <CheckCircle className="h-4 w-4 text-green-600" />
@@ -344,12 +432,23 @@ const Transmissions = () => {
                 </label>
                 <div className="relative">
                   <BookOpen className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <select id="book" className="input pl-9">
-                    <option value="">Select a book</option>
-                    <option value="1">The Great Gatsby</option>
-                    <option value="2">To Kill a Mockingbird</option>
-                    <option value="3">1984</option>
-                    <option value="4">Pride and Prejudice</option>
+                  <select 
+                    id="book"
+                    value={issueForm.bookId}
+                    onChange={(e) => setIssueForm({...issueForm, bookId: e.target.value})}
+                    className="input pl-9"
+                    disabled={isLoadingBooks}
+                  >
+                    <option value="">Выберите книгу</option>
+                    {isLoadingBooks ? (
+                      <option>Загрузка книг...</option>
+                    ) : (
+                      books.map(book => (
+                        <option key={book.id} value={book.id}>
+                          {book.title}
+                        </option>
+                      ))
+                    )}
                   </select>
                 </div>
               </div>
@@ -360,12 +459,23 @@ const Transmissions = () => {
                 </label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <select id="user" className="input pl-9">
-                    <option value="">Select a user</option>
-                    <option value="1">john.doe</option>
-                    <option value="2">jane.smith</option>
-                    <option value="3">robert.johnson</option>
-                    <option value="4">emily.williams</option>
+                  <select 
+                    id="user"
+                    value={issueForm.userId}
+                    onChange={(e) => setIssueForm({...issueForm, userId: e.target.value})}
+                    className="input pl-9"
+                    disabled={isLoadingUsers}
+                  >
+                    <option value="">Выберите пользователя</option>
+                    {isLoadingUsers ? (
+                      <option>Загрузка пользователей...</option>
+                    ) : (
+                      users.map(user => (
+                        <option key={user.id} value={user.id}>
+                          {user.login}
+                        </option>
+                      ))
+                    )}
                   </select>
                 </div>
               </div>
@@ -379,7 +489,8 @@ const Transmissions = () => {
                   <input
                     id="issueDate"
                     type="date"
-                    defaultValue={new Date().toISOString().split('T')[0]}
+                    value={issueForm.issuanceDate}
+                    onChange={(e) => setIssueForm({...issueForm, issuanceDate: e.target.value})}
                     className="input pl-9"
                   />
                 </div>
@@ -394,7 +505,8 @@ const Transmissions = () => {
                   <input
                     id="dueDate"
                     type="date"
-                    defaultValue={new Date(new Date().setDate(new Date().getDate() + 14)).toISOString().split('T')[0]}
+                    value={issueForm.dueDate}
+                    onChange={(e) => setIssueForm({...issueForm, dueDate: e.target.value})}
                     className="input pl-9"
                   />
                 </div>
@@ -410,11 +522,9 @@ const Transmissions = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    setShowForm(false);
-                    toast.success('Книга выдана успешно');
-                  }}
+                  onClick={handleIssueSubmit}
                   className="btn btn-primary btn-md"
+                  disabled={isLoadingBooks || isLoadingUsers}
                 >
                   Выдать книгу
                 </button>
