@@ -2,59 +2,100 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+import { AxiosError } from 'axios';
+
+interface UserData {
+  id: number | null;
+  login: string | null;
+  role: string | null;
+}
 
 interface AuthState {
-  token: string | null;
-  user: any | null;
+  user: UserData | null;
   isAuthenticated: boolean;
   login: (username: string, password: string) => Promise<boolean>;
-  logout: () => void;
+  logout: () => Promise<void>;
+  checkAuth: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
-      token: null,
+    (set, get) => ({
       user: null,
       isAuthenticated: false,
       
       login: async (login: string, password: string) => {
         try {
-          const response = await api.post('/api/Auth/login', { login, password });
+          const response = await api.post(
+            '/api/Auth/login', 
+            { login, password },
+            { withCredentials: true }
+          );
           
-          // Assuming the API returns a token and user info
-          // In a real app, you would extract this from the response
-          // This is a mockup since we don't know the exact response structure
           set({ 
-            token: 'mock-token',  // In real app: response.data.token
-            user: { login },      // In real app: response.data.user
+            user: {
+              id: response.data.Id,
+              login: response.data.Login,
+              role: response.data.Role
+            },
             isAuthenticated: true
           });
           
-          toast.success('Login successful');
+          toast.success('Вход выполнен успешно');
           return true;
         } catch (error) {
-          console.error('Login failed:', error);
-          toast.error('Login failed. Please check your credentials.');
+          console.error('Ошибка входа:', error);
+          
+          let errorMessage = 'Ошибка входа. Проверьте учетные данные';
+          
+          if (error instanceof AxiosError && error.response?.data?.message) {
+            errorMessage = error.response.data.message;
+          }
+          
+          toast.error(errorMessage);
           return false;
         }
       },
       
       logout: async () => {
         try {
-          await api.post('/api/Auth/logout');
-          // Even if the API call fails, we still want to clear the local state
+          await api.post(
+            '/api/Auth/logout', 
+            {}, 
+            { withCredentials: true }
+          );
         } catch (error) {
-          console.error('Error during logout:', error);
+          console.error('Ошибка при выходе:', error);
         } finally {
-          set({ token: null, user: null, isAuthenticated: false });
-          toast.success('Logged out successfully');
+          set({ 
+            user: null, 
+            isAuthenticated: false 
+          });
+          toast.success('Выход выполнен успешно');
+        }
+      },
+      
+      checkAuth: async () => {
+        try {
+          await api.get('/api/Auth/check', { withCredentials: true });
+          
+          if (!get().isAuthenticated) {
+            set({ isAuthenticated: true });
+          }
+        } catch {
+          set({ 
+            user: null, 
+            isAuthenticated: false 
+          });
         }
       }
     }),
     {
       name: 'auth-storage',
-      partialize: (state) => ({ token: state.token, user: state.user, isAuthenticated: state.isAuthenticated }),
+      partialize: (state) => ({ 
+        user: state.user,
+        isAuthenticated: state.isAuthenticated
+      }),
     }
   )
 );

@@ -51,7 +51,8 @@ namespace Project.Backend.Controllers
 
             // Возвращаем токен и в теле ответа для дополнительной надежности
             return Ok(new { 
-                Token = token, 
+                Id = user.Id,
+                Login = user.Login,
                 Role = user.Role?.Name 
             });
         }
@@ -97,6 +98,13 @@ namespace Project.Backend.Controllers
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
+        }
+
+        [HttpGet("check")]
+        [Authorize]
+        public IActionResult CheckAuth()
+        {
+            return Ok();
         }
 
         public class LoginDto

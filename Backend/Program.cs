@@ -43,9 +43,10 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy.WithOrigins("http://localhost:5173")
-              .AllowCredentials()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+            .AllowCredentials() // Разрешаем передачу кук
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .WithExposedHeaders("Set-Cookie"); // Разрешаем доступ к кукам
     });
 });
 

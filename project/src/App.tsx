@@ -20,13 +20,12 @@ import NotFound from './pages/NotFound';
 
 // Protected route component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, checkAuth } = useAuthStore();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login');
-    }
+    checkAuth(); // Проверяем статус аутентификации
+    if (!isAuthenticated) navigate('/login');
   }, [isAuthenticated, navigate]);
 
   return isAuthenticated ? <>{children}</> : null;
