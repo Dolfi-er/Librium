@@ -111,6 +111,29 @@ namespace Project.Backend.Controllers
                     StatusName = t.Status.StatusName
                 })
                 .ToListAsync();
+        }
+
+        // GET: api/transmission/recent
+        [HttpGet("recent")]
+        public async Task<IActionResult> GetRecentTransmissions()
+        {
+            var recentTransmissions = await _context.Transmissions
+                .Include(t => t.Book)
+                .Include(t => t.User)
+                .Include(t => t.Status)
+                .OrderByDescending(t => t.IssuanceDate)
+                .Take(5)
+                .Select(t => new 
+                {
+                    t.Id,
+                    BookTitle = t.Book.Title,
+                    UserLogin = t.User.Login,
+                    t.DueDate,
+                    StatusName = t.Status.StatusName
+                })
+                .ToListAsync();
+
+            return Ok(recentTransmissions);
         }        
 
         // POST: api/transmission

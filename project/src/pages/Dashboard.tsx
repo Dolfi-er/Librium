@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  BookOpen, Users, BookCopy, TrendingUp, AlertTriangle, 
+  BookOpen, Users, BookCopy, AlertTriangle, 
   Clock, BookMarked, CheckCircle 
 } from 'lucide-react';
 import api from '../services/api';
@@ -15,39 +15,23 @@ const Dashboard = () => {
     overdueBooks: 0
   });
   
-  const [recentTransmissions, setRecentTransmissions] = useState([]);
+  const [recentTransmissions, setRecentTransmissions] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       setIsLoading(true);
       try {
-        // In a real app, this would be a single API endpoint or multiple concurrent requests
-        // For demo purposes, we're using mock data
-        
-        // Simulate API call
-        setTimeout(() => {
-          setStats({
-            totalBooks: 1287,
-            totalAuthors: 342,
-            totalUsers: 156,
-            totalTransmissions: 2341,
-            overdueBooks: 17
-          });
-          
-          setRecentTransmissions([
-            { id: 1, bookTitle: 'The Great Gatsby', userLogin: 'john.doe', dueDate: '2025-07-20', statusName: 'Active' },
-            { id: 2, bookTitle: 'To Kill a Mockingbird', userLogin: 'jane.smith', dueDate: '2025-07-15', statusName: 'Overdue' },
-            { id: 3, bookTitle: '1984', userLogin: 'robert.johnson', dueDate: '2025-07-22', statusName: 'Active' },
-            { id: 4, bookTitle: 'The Hobbit', userLogin: 'mary.williams', dueDate: '2025-07-18', statusName: 'Active' },
-            { id: 5, bookTitle: 'Pride and Prejudice', userLogin: 'david.brown', dueDate: '2025-07-12', statusName: 'Overdue' }
-          ]);
-          
-          setIsLoading(false);
-        }, 500);
-        
+        // Получение статистики
+        const statsResponse = await api.get('/api/Dashboard/stats');
+        setStats(statsResponse.data);
+
+        // Получение последних выдач
+        const transmissionsResponse = await api.get('/api/Transmission/recent');
+        setRecentTransmissions(transmissionsResponse.data);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
+      } finally {
         setIsLoading(false);
       }
     };

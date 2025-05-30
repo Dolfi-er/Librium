@@ -244,7 +244,7 @@ const Authors = () => {
               <table className="table">
                 <thead>
                   <tr>
-                    <th>ID</th>
+                    
                     <th>Имя автора</th>
                     <th>Управление</th>
                   </tr>
@@ -252,7 +252,7 @@ const Authors = () => {
                 <tbody>
                   {currentItems.map((author) => (
                     <tr key={author.id}>
-                      <td className="w-16">{author.id}</td>
+                      
                       <td className="font-medium">{author.authorName}</td>
                       <td>
                         <div className="flex space-x-2">

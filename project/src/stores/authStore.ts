@@ -32,15 +32,15 @@ export const useAuthStore = create<AuthState>()(
             { withCredentials: true }
           );
           
-          set({ 
-            user: {
-              id: response.data.Id,
-              login: response.data.Login,
-              role: response.data.Role
-            },
-            isAuthenticated: true
-          });
-          
+        
+        set({ 
+          user: {
+            id: response.data.id,       
+            login: response.data.login, 
+            role: response.data.role    
+          },
+          isAuthenticated: true
+        });
           toast.success('Вход выполнен успешно');
           return true;
         } catch (error) {

@@ -7,7 +7,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Добавление сервисов аутентификации
+//Аутентификация
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -37,27 +37,27 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Настройка CORS
+// Корсы
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy.WithOrigins("http://localhost:5173")
-            .AllowCredentials() // Разрешаем передачу кук
+            .AllowCredentials() 
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .WithExposedHeaders("Set-Cookie"); // Разрешаем доступ к кукам
+            .WithExposedHeaders("Set-Cookie");
     });
 });
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
-// Настройка БД
+//БД
 builder.Services.AddDbContext<AppDBContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Настройка Swagger
+//Сваггер
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -72,7 +72,6 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Middleware pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -84,15 +83,15 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Применение миграций и инициализация данных
+//Миграции
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<AppDBContext>();
-        context.Database.Migrate(); // Применяет миграции
-        await SeedData.Initialize(context, "1234"); // Заполняет начальные данные
+        context.Database.Migrate();
+        await SeedData.Initialize(context, "1234");
     }
     catch (Exception ex)
     {
@@ -101,7 +100,6 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Автоматическая привязка токена из куки
 app.Use(async (context, next) =>
 {
     var token = context.Request.Cookies["access_token"];
