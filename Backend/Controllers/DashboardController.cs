@@ -30,7 +30,7 @@ namespace Project.Backend.Controllers
                 TotalUsers = await _context.Users.CountAsync(),
                 TotalTransmissions = await _context.Transmissions.CountAsync(),
                 OverdueBooks = await _context.Transmissions
-                    .CountAsync(t => t.Status.StatusName == "Overdue")
+                    .CountAsync(t => t.StatusId == 3)
             };
 
             return Ok(stats);

@@ -2,10 +2,16 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
   ArrowLeft, Save, BookOpen, Star, Calendar, Bookmark, 
-  Hash, Package, Users, Trash, Clock
+  Hash, Package, Users, Trash, Clock, AlertTriangle, CheckCircle
 } from 'lucide-react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+
+const TRANSMISSION_STATUSES = {
+  ISSUED: 1,      // Выдана
+  RETURNED: 2,    // Возвращена
+  OVERDUE: 3      // Задержана
+};
 
 interface Author {
   id: number;
@@ -98,18 +104,21 @@ const BookDetails = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // In a real app, we would update via API
-      // await api.put(`/api/Books/${id}`, formData);
+      // Отправляем запрос на обновление книги через API
+      await api.put(`/api/Books/${id}`, formData);
       
-      // For demo purposes, just update local state
-      if (book) {
-        const updatedBook = { ...book, ...formData };
-        setBook(updatedBook);
-        toast.success('Книга обновлена');
-        setIsEditing(false);
-      }
+      // Получаем обновленные данные книги с сервера
+      const bookResponse = await api.get(`/api/Books/${id}`);
+      const updatedBook = bookResponse.data;
+      
+      // Обновляем состояние
+      setBook(updatedBook);
+      setFormData(updatedBook);
+      
+      toast.success('Книга успешно обновлена');
+      setIsEditing(false);
     } catch (error) {
-      console.error('Error updating book:', error);
+      console.error('Ошибка при обновлении книги:', error);
       toast.error('Не удалось обновить книгу');
     }
   };
@@ -440,10 +449,20 @@ const BookDetails = () => {
                         <td>{new Date(transmission.dueDate).toLocaleDateString()}</td>
                         <td>
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            transmission.statusName === 'Returned' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-blue-100 text-blue-800'
+                            transmission.statusId === TRANSMISSION_STATUSES.ISSUED
+                              ? 'bg-blue-100 text-blue-800' 
+                              : transmission.statusId === TRANSMISSION_STATUSES.RETURNED
+                                ? 'bg-green-100 text-green-800'
+                                : transmission.statusId === TRANSMISSION_STATUSES.OVERDUE
+                                  ? 'bg-red-100 text-red-800'
+                                  : 'bg-gray-100 text-gray-800'
                           }`}>
+                            {transmission.statusId === TRANSMISSION_STATUSES.OVERDUE && (
+                              <AlertTriangle className="mr-1 h-3 w-3" />
+                            )}
+                            {transmission.statusId === TRANSMISSION_STATUSES.RETURNED && (
+                              <CheckCircle className="mr-1 h-3 w-3" />
+                            )}
                             {transmission.statusName}
                           </span>
                         </td>

@@ -6,6 +6,12 @@ import {
 } from 'lucide-react';
 import api from '../services/api';
 
+const TRANSMISSION_STATUSES = {
+  ISSUED: 1,      // Выдана
+  RETURNED: 2,    // Возвращена
+  OVERDUE: 3      // Задержана
+};
+
 const Dashboard = () => {
   const [stats, setStats] = useState({
     totalBooks: 0,
@@ -118,13 +124,18 @@ const Dashboard = () => {
                       <td>{new Date(transmission.dueDate).toLocaleDateString()}</td>
                       <td>
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          transmission.statusName === 'Overdue' 
-                            ? 'bg-red-100 text-red-800' 
-                            : 'bg-green-100 text-green-800'
+                          transmission.statusName === 'Выдана'
+                            ? 'bg-blue-100 text-blue-800' 
+                            : transmission.statusName === 'Возвращена'
+                              ? 'bg-green-100 text-green-800'
+                              : transmission.statusName === 'Задержана'
+                                ? 'bg-red-100 text-red-800'
+                                : 'bg-gray-100 text-gray-800'
                         }`}>
-                          {transmission.statusName === 'Overdue' ? (
+                          {transmission.statusName === 'Задержана' && (
                             <AlertTriangle className="mr-1 h-3 w-3" />
-                          ) : (
+                          )}
+                          {transmission.statusName === 'Возвращена' && (
                             <CheckCircle className="mr-1 h-3 w-3" />
                           )}
                           {transmission.statusName}

@@ -34,6 +34,12 @@ interface User {
   login: string;
 }
 
+const TRANSMISSION_STATUSES = {
+  ISSUED: 1,      // Выдана
+  RETURNED: 2,    // Возвращена
+  OVERDUE: 3      // Задержана
+};
+
 const Transmissions = () => {
   const location = useLocation();
   const [transmissions, setTransmissions] = useState<Transmission[]>([]);
@@ -136,7 +142,7 @@ const Transmissions = () => {
 
   const handleMarkAsReturned = async (transmission: Transmission) => {
     try {
-      const returnedStatus = statuses.find(s => s.statusName === 'Возвращена');
+      const returnedStatus = statuses.find(s => s.id === TRANSMISSION_STATUSES.RETURNED);
       if (!returnedStatus) {
         throw new Error('Статус "Возвращена" не найден');
       }
@@ -160,7 +166,7 @@ const Transmissions = () => {
     }
 
     try {
-      const issuedStatus = statuses.find(s => s.statusName === 'Выдана');
+      const issuedStatus = statuses.find(s => s.id === TRANSMISSION_STATUSES.ISSUED);
       if (!issuedStatus) {
         throw new Error('Статус "Выдана" не найден');
       }
@@ -206,7 +212,7 @@ const Transmissions = () => {
     }
     
     if (showOverdueOnly) {
-      filtered = filtered.filter(transmission => transmission.statusName === 'Задержана');
+      filtered = filtered.filter(transmission => transmission.statusId === TRANSMISSION_STATUSES.OVERDUE);
     }
     
     setFilteredTransmissions(filtered);
@@ -261,7 +267,9 @@ const Transmissions = () => {
             >
               <option value="">Все статусы</option>
               {statuses.map(status => (
-                <option key={status.id} value={status.id}>{status.statusName}</option>
+                <option key={status.id} value={status.id}>
+                  {status.statusName}
+                </option>
               ))}
             </select>
             
@@ -335,18 +343,18 @@ const Transmissions = () => {
                       <td>{new Date(transmission.dueDate).toLocaleDateString()}</td>
                       <td>
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          transmission.statusName === 'Выдана' 
+                          transmission.statusId === TRANSMISSION_STATUSES.ISSUED
                             ? 'bg-blue-100 text-blue-800' 
-                            : transmission.statusName === 'Возвращена'
+                            : transmission.statusId === TRANSMISSION_STATUSES.RETURNED
                               ? 'bg-green-100 text-green-800'
-                              : transmission.statusName === 'Задержана'
+                              : transmission.statusId === TRANSMISSION_STATUSES.OVERDUE
                                 ? 'bg-red-100 text-red-800'
                                 : 'bg-gray-100 text-gray-800'
                         }`}>
-                          {transmission.statusName === 'Задержана' && (
+                          {transmission.statusId === TRANSMISSION_STATUSES.OVERDUE && (
                             <AlertTriangle className="mr-1 h-3 w-3" />
                           )}
-                          {transmission.statusName === 'Возвращена' && (
+                          {transmission.statusId === TRANSMISSION_STATUSES.RETURNED && (
                             <CheckCircle className="mr-1 h-3 w-3" />
                           )}
                           {transmission.statusName}
@@ -354,7 +362,7 @@ const Transmissions = () => {
                       </td>
                       <td>
                         <div className="flex space-x-2">
-                          {transmission.statusName === 'Выдана' && (
+                          {(transmission.statusId === TRANSMISSION_STATUSES.ISSUED || transmission.statusId === TRANSMISSION_STATUSES.OVERDUE)&& (
                             <button
                               onClick={() => handleMarkAsReturned(transmission)}
                               title="Отметить как возвращенную"

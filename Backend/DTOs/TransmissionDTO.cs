@@ -11,6 +11,13 @@ namespace Project.Backend.DTOs
         [Required] public int StatusId { get; set; }
     }
 
+    public static class TransmissionStatuses
+    {
+        public const int Issued = 1;      // Выдана
+        public const int Returned = 2;    // Возвращена
+        public const int Overdue = 3;     // Задержана
+    }
+
     public class TransmissionUpdateDto
     {
         public DateTime? DueDate { get; set; }

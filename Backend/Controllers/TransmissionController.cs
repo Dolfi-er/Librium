@@ -20,10 +20,35 @@ namespace Project.Backend.Controllers
             _context = context;
         }
 
+        // Автоматическое обновление статусов для просроченных выдач
+        private async Task UpdateOverdueTransmissions()
+        {
+            var currentDate = DateTime.UtcNow.Date;
+            var issuedStatusId = 1; // Статус "Выдана"
+            var overdueStatusId = 3; // Статус "Задержана"
+
+            // Находим просроченные выдачи
+            var overdueTransmissions = await _context.Transmissions
+                .Where(t => t.StatusId == issuedStatusId && t.DueDate < currentDate)
+                .ToListAsync();
+
+            // Обновляем статус
+            foreach (var transmission in overdueTransmissions)
+            {
+                transmission.StatusId = overdueStatusId;
+            }
+
+            if (overdueTransmissions.Any())
+            {
+                await _context.SaveChangesAsync();
+            }
+        }
+
         // GET: api/transmission
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TransmissionResponseDto>>> GetTransmissions()
         {
+            await UpdateOverdueTransmissions();
             return await _context.Transmissions
                 .Include(t => t.Book)
                 .Include(t => t.User)
@@ -46,6 +71,7 @@ namespace Project.Backend.Controllers
         [HttpGet("{bookId}/{userId}")]
         public async Task<ActionResult<TransmissionResponseDto>> GetTransmission(int bookId, int userId)
         {
+            await UpdateOverdueTransmissions();
             var transmission = await _context.Transmissions
                 .Include(t => t.Book)
                 .Include(t => t.User)
@@ -71,6 +97,7 @@ namespace Project.Backend.Controllers
         [HttpGet("user/{userId}")]
         public async Task<ActionResult<IEnumerable<TransmissionResponseDto>>> GetTransmissionsByUser(int userId)
         {
+            await UpdateOverdueTransmissions();
             return await _context.Transmissions
                 .Include(t => t.Book)
                 .Include(t => t.User)
@@ -94,6 +121,7 @@ namespace Project.Backend.Controllers
         [HttpGet("book/{bookId}")]
         public async Task<ActionResult<IEnumerable<TransmissionResponseDto>>> GetTransmissionsByBook(int bookId)
         {
+            await UpdateOverdueTransmissions();
             return await _context.Transmissions
                 .Include(t => t.Book)
                 .Include(t => t.User)
@@ -117,6 +145,7 @@ namespace Project.Backend.Controllers
         [HttpGet("recent")]
         public async Task<IActionResult> GetRecentTransmissions()
         {
+            await UpdateOverdueTransmissions();
             var recentTransmissions = await _context.Transmissions
                 .Include(t => t.Book)
                 .Include(t => t.User)

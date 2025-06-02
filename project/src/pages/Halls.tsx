@@ -362,7 +362,6 @@ const Halls = () => {
               <table className="table">
                 <thead>
                   <tr>
-                    <th>ID</th>
                     <th>Библиотека</th>
                     <th>Название зала</th>
                     <th>Вместимость</th>
@@ -373,7 +372,6 @@ const Halls = () => {
                 <tbody>
                   {currentItems.map((hall) => (
                     <tr key={hall.id}>
-                      <td className="w-16">{hall.id}</td>
                       <td>{hall.libraryName}</td>
                       <td className="font-medium">{hall.hallName}</td>
                       <td>{hall.totalCapacity}</td>

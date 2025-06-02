@@ -1,9 +1,5 @@
 import { useState, useEffect } from 'react';
-import { 
-  Search, Plus, ChevronLeft, ChevronRight, 
-  Users as UsersIcon, Trash, PenSquare, X,
-  Filter, UserCircle
-} from 'lucide-react';
+import { Search, Plus, ChevronLeft, ChevronRight, UsersIcon, Trash, PenSquare, X, Filter, UserCircle, Eye, EyeOff } from 'lucide-react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 
@@ -56,7 +52,8 @@ const Users = () => {
     phone: '',
   });
   const [halls, setHalls] = useState<any[]>([]);
-  const itemsPerPage = 10;
+  const [itemsPerPage] = useState(10);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -140,6 +137,7 @@ const Users = () => {
         fio: '',
         phone: '',
       });
+      setShowPassword(false);
       fetchUsersAndRoles();
     } catch (error) {
       console.error('Error saving user:', error);
@@ -362,18 +360,22 @@ const Users = () => {
                 onClick={() => {
                   setShowUserForm(false);
                   setEditingUser(null);
+                  setShowPassword(false);
                 }}
                 className="p-1 rounded-full hover:bg-gray-100"
               >
                 <X className="h-5 w-5 text-gray-500" />
               </button>
             </div>
-            
+            <p>
+              ** - обязательное поле для всех ролей, 
+              * - обязательное поле для роли Читатель
+            </p>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="login" className="block text-sm font-medium text-gray-700 mb-1">
-                    Логин
+                    Логин**
                   </label>
                   <input
                     id="login"
@@ -383,27 +385,42 @@ const Users = () => {
                     onChange={handleInputChange}
                     className="input"
                     required
+                    placeholder='ivanov.i.i'
                   />
                 </div>
                 
                 <div>
                   <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                    Пароль
+                    Пароль**
                   </label>
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    className="input"
-                    required={!editingUser}
-                  />
+                  <div className="relative">
+                    <input
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      className="input pr-10"
+                      required={!editingUser}
+                      placeholder='123456'
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
                 </div>
                 
                 <div>
                   <label htmlFor="fio" className="block text-sm font-medium text-gray-700 mb-1">
-                    ФИО
+                    ФИО**
                   </label>
                   <input
                     id="fio"
@@ -412,13 +429,14 @@ const Users = () => {
                     value={formData.fio}
                     onChange={handleInputChange}
                     className="input"
+                    placeholder='Иванов Иван Иванович'
                     required
                   />
                 </div>
                 
                 <div>
                   <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                    Телефон
+                    Телефон**
                   </label>
                   <input
                     id="phone"
@@ -427,13 +445,14 @@ const Users = () => {
                     value={formData.phone}
                     onChange={handleInputChange}
                     className="input"
+                    placeholder='+74951234567'
                     required
                   />
                 </div>
                 
                 <div>
                   <label htmlFor="roleId" className="block text-sm font-medium text-gray-700 mb-1">
-                    Роль
+                    Роль**
                   </label>
                   <select
                     id="roleId"
@@ -453,7 +472,7 @@ const Users = () => {
                 
                 <div>
                   <label htmlFor="hallId" className="block text-sm font-medium text-gray-700 mb-1">
-                    Зал
+                    Зал*
                   </label>
                   <select
                     id="hallId"
@@ -473,7 +492,7 @@ const Users = () => {
                 
                 <div>
                   <label htmlFor="ticketNumber" className="block text-sm font-medium text-gray-700 mb-1">
-                    Номер билета
+                    Номер билета*
                   </label>
                   <input
                     id="ticketNumber"
@@ -482,12 +501,13 @@ const Users = () => {
                     value={formData.ticketNumber || ''}
                     onChange={handleInputChange}
                     className="input"
+                    placeholder='1234567890'
                   />
                 </div>
                 
                 <div>
                   <label htmlFor="birthday" className="block text-sm font-medium text-gray-700 mb-1">
-                    День рождения
+                    День рождения*
                   </label>
                   <input
                     id="birthday"
@@ -501,7 +521,7 @@ const Users = () => {
                 
                 <div className="md:col-span-2">
                   <label htmlFor="education" className="block text-sm font-medium text-gray-700 mb-1">
-                    Образование
+                    Образование*
                   </label>
                   <input
                     id="education"
@@ -510,6 +530,7 @@ const Users = () => {
                     value={formData.education || ''}
                     onChange={handleInputChange}
                     className="input"
+                    placeholder='Образование'
                   />
                 </div>
               </div>
@@ -520,6 +541,7 @@ const Users = () => {
                   onClick={() => {
                     setShowUserForm(false);
                     setEditingUser(null);
+                    setShowPassword(false);
                   }}
                   className="btn btn-ghost btn-md border border-gray-200"
                 >
