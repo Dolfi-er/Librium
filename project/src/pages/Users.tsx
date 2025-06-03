@@ -106,6 +106,25 @@ const Users = () => {
 
   const handleEditUser = (user: User) => {
     setEditingUser(user);
+    
+    // Преобразование даты рождения при редактировании
+    let birthdayISO = null;
+    if (user.info.birthday) {
+      const date = new Date(user.info.birthday);
+      birthdayISO = date.toISOString(); // Конвертация в ISO с временем 00:00
+    }
+
+    setFormData({
+      login: user.login,
+      password: '',
+      roleId: user.role.id,
+      fio: user.info.fio,
+      phone: user.info.phone,
+      ticketNumber: user.info.ticketNumber || undefined,
+      birthday: birthdayISO || undefined, // Используем ISO формат
+      education: user.info.education || undefined,
+      hallId: user.info.hallId || undefined
+    });
     setShowUserForm(true);
   };
 
@@ -119,12 +138,22 @@ const Users = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+     // Создаем копию данных формы для преобразования
+    const dataToSend = { ...formData };
+    
+    // Преобразование birthday в формат с временем 00:00
+    if (dataToSend.birthday) {
+      const date = new Date(dataToSend.birthday);
+      dataToSend.birthday = date.toISOString();
+    }
+    console.log(dataToSend);
     try {
       if (editingUser) {
-        await api.put(`/api/User/${editingUser.id}`, formData);
+        await api.put(`/api/User/${editingUser.id}`, dataToSend);
         toast.success('Пользователь обновлен');
       } else {
-        await api.post('/api/User', formData);
+        await api.post('/api/User', dataToSend);
         toast.success('Пользователь добавлен');
       }
       
