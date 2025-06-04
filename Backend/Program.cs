@@ -8,6 +8,9 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Добавьте эту строку после CreateBuilder
+builder.WebHost.UseUrls("http://*:80");
+
 //Аутентификация
 builder.Services.AddAuthentication(options =>
 {
@@ -39,20 +42,21 @@ builder.Services.AddAuthentication(options =>
 });
 
 // Корсы
-builder.Services.AddCors(options =>
+builder.Services.AddCors(options => 
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
-            .AllowCredentials() 
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .WithExposedHeaders("Set-Cookie");
+        policy.WithOrigins("http://localhost:5173", "http://localhost:80", "http://localhost:5000")
+              .AllowCredentials()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
     });
 });
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
+
+builder.Services.AddScoped<IHallCapacityService, HallCapacityService>();
 
 //БД
 builder.Services.AddDbContext<AppDBContext>(options =>
@@ -70,8 +74,6 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "bearer"
     });
 });
-
-builder.Services.AddScoped<IHallCapacityService, HallCapacityService>();
 
 var app = builder.Build();
 
@@ -93,13 +95,32 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<AppDBContext>();
-        context.Database.Migrate();
-        await SeedData.Initialize(context, "1234");
+        
+        // Ждем пока БД станет доступна (макс 30 секунд)
+        var maxRetries = 30;
+        var delay = 1000; // 1 секунда
+        while (!context.Database.CanConnect() && maxRetries-- > 0)
+        {
+            Console.WriteLine($"Database not ready. Retrying in {delay}ms... ({maxRetries} retries left)");
+            await Task.Delay(delay);
+        }
+
+        if (context.Database.CanConnect())
+        {
+            // Применяем миграции
+            context.Database.Migrate();
+            await SeedData.Initialize(context, "1234");
+        }
+        else
+        {
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger.LogError("Failed to connect to database after 30 seconds");
+        }
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Ошибка при инициализации базы данных");
+        logger.LogError(ex, "Database initialization error");
     }
 }
 

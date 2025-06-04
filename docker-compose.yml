@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    env_file: .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d Librium_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    environment:
+      POSTGRES_DB: Librium_test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "1234"
+
+  backend:
+    build:
+      context: .
+      dockerfile: Backend/Dockerfile
+    env_file: .env
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:80
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=Librium_test;Username=postgres;Password=1234"
+      Jwt__Key: "super_secret_key_512_bits_long_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+      Jwt__Issuer: "library-server"
+      Jwt__Audience: "library-client"
+      Jwt__ExpireHours: "6"
+    ports:
+      - "5000:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - keys:/app/keys
+
+  frontend:
+    build:
+      context: .
+      dockerfile: project/Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    volumes:
+      - ./project/nginx.conf:/etc/nginx/conf.d/default.conf
+      
+volumes:
+  pgdata:
+  keys:
