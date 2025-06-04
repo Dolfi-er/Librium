@@ -17,10 +17,6 @@ namespace Project.Backend.DTOs
         [DefaultValue(1)]
         public int TotalCapacity { get; set; }
 
-        [Required]
-        [DefaultValue(0)]
-        public int TakenCapacity { get; set; }
-
         public string? Specification { get; set; }
     }
 
@@ -37,10 +33,6 @@ namespace Project.Backend.DTOs
         [Required]
         [DefaultValue(1)]
         public int TotalCapacity { get; set; }
-
-        [Required]
-        [DefaultValue(0)]
-        public int TakenCapacity { get; set; }
 
         public string? Specification { get; set; }
     }

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Project.Backend.Data;
 using Project.Backend.Models;
 using Project.Backend.DTOs;
+using Project.Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Project.Backend.Controllers
@@ -13,10 +14,12 @@ namespace Project.Backend.Controllers
     public class HallController : ControllerBase
     {
         private readonly AppDBContext _context;
+        private readonly IHallCapacityService _hallCapacityService;
 
-        public HallController(AppDBContext context)
+        public HallController(AppDBContext context, IHallCapacityService hallCapacityService)
         {
             _context = context;
+            _hallCapacityService = hallCapacityService;
         }
 
         // GET: api/halls
@@ -77,7 +80,7 @@ namespace Project.Backend.Controllers
                 LibraryName = hallDto.LibraryName,
                 HallName = hallDto.HallName,
                 TotalCapacity = hallDto.TotalCapacity,
-                TakenCapacity = hallDto.TakenCapacity,
+                TakenCapacity = 0, // Автоматически устанавливаем в 0 при создании
                 Specification = hallDto.Specification
             };
 
@@ -112,15 +115,26 @@ namespace Project.Backend.Controllers
                 return NotFound();
             }
 
+            // Проверяем, не станет ли новая вместимость меньше текущего количества пользователей
+            if (hallDto.TotalCapacity < hall.TakenCapacity)
+            {
+                return BadRequest(new { 
+                    message = $"Нельзя установить вместимость меньше текущего количества пользователей ({hall.TakenCapacity})" 
+                });
+            }
+
             hall.LibraryName = hallDto.LibraryName;
             hall.HallName = hallDto.HallName;
             hall.TotalCapacity = hallDto.TotalCapacity;
-            hall.TakenCapacity = hallDto.TakenCapacity;
             hall.Specification = hallDto.Specification;
+            // TakenCapacity не обновляется вручную
 
             try
             {
                 await _context.SaveChangesAsync();
+                
+                // Обновляем TakenCapacity для актуализации данных
+                await _hallCapacityService.UpdateHallCapacityAsync(id);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -145,6 +159,18 @@ namespace Project.Backend.Controllers
             if (hall == null)
             {
                 return NotFound();
+            }
+
+            // Проверяем, есть ли пользователи, привязанные к этому залу
+            var usersInHall = await _context.Users
+                .Include(u => u.Info)
+                .CountAsync(u => u.Info.HallId == id);
+
+            if (usersInHall > 0)
+            {
+                return BadRequest(new { 
+                    message = $"Нельзя удалить зал, к которому привязано {usersInHall} пользователей. Сначала переместите или удалите пользователей." 
+                });
             }
 
             _context.Halls.Remove(hall);

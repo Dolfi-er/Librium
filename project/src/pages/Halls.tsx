@@ -28,7 +28,6 @@ const Halls = () => {
     libraryName: "",
     hallName: "",
     totalCapacity: 1,
-    takenCapacity: 0,
     specification: "",
   })
   const itemsPerPage = 10
@@ -76,7 +75,7 @@ const Halls = () => {
     const { name, value } = e.target
     setNewHall((prev) => ({
       ...prev,
-      [name]: name === "totalCapacity" || name === "takenCapacity" ? Number.parseInt(value) || 0 : value,
+      [name]: name === "totalCapacity" ? Number.parseInt(value) || 0 : value,
     }))
   }
 
@@ -91,11 +90,6 @@ const Halls = () => {
       return
     }
 
-    if (newHall.takenCapacity < 0 || newHall.takenCapacity > newHall.totalCapacity) {
-      toast.error("Занятая вместимость должна быть от 0 до общей вместимости")
-      return
-    }
-
     try {
       const response = await api.post("/api/Hall", newHall)
       const createdHall = response.data
@@ -105,7 +99,6 @@ const Halls = () => {
         libraryName: "",
         hallName: "",
         totalCapacity: 1,
-        takenCapacity: 0,
         specification: "",
       })
       setShowAddForm(false)
@@ -129,29 +122,25 @@ const Halls = () => {
       return
     }
 
-    if (newHall.takenCapacity < 0 || newHall.takenCapacity > newHall.totalCapacity) {
-      toast.error("Занятая вместимость должна быть от 0 до общей вместимости")
-      return
-    }
-
     try {
       await api.put(`/api/Hall/${editingHall.id}`, newHall)
 
-      const updatedHalls = halls.map((hall) => (hall.id === editingHall.id ? { ...hall, ...newHall } : hall))
+      // Обновляем список залов
+      const response = await api.get("/api/Hall")
+      setHalls(response.data)
 
-      setHalls(updatedHalls)
       setEditingHall(null)
       setNewHall({
         libraryName: "",
         hallName: "",
         totalCapacity: 1,
-        takenCapacity: 0,
         specification: "",
       })
       toast.success("Информация о зале обновлена")
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating hall:", error)
-      toast.error("Не удалось обновить информацию о зале")
+      const errorMessage = error.response?.data?.message || "Не удалось обновить информацию о зале"
+      toast.error(errorMessage)
     }
   }
 
@@ -165,9 +154,10 @@ const Halls = () => {
       const updatedHalls = halls.filter((hall) => hall.id !== id)
       setHalls(updatedHalls)
       toast.success("Зал удален")
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deleting hall:", error)
-      toast.error("Не удалось удалить зал")
+      const errorMessage = error.response?.data?.message || "Не удалось удалить зал"
+      toast.error(errorMessage)
     }
   }
 
@@ -177,7 +167,6 @@ const Halls = () => {
       libraryName: hall.libraryName,
       hallName: hall.hallName,
       totalCapacity: hall.totalCapacity,
-      takenCapacity: hall.takenCapacity,
       specification: hall.specification || "",
     })
     setShowAddForm(false)
@@ -189,7 +178,6 @@ const Halls = () => {
       libraryName: "",
       hallName: "",
       totalCapacity: 1,
-      takenCapacity: 0,
       specification: "",
     })
   }
@@ -209,7 +197,6 @@ const Halls = () => {
               libraryName: "",
               hallName: "",
               totalCapacity: 1,
-              takenCapacity: 0,
               specification: "",
             })
           }}
@@ -276,22 +263,21 @@ const Halls = () => {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Занятая вместимость *</label>
-              <input
-                type="number"
-                name="takenCapacity"
-                placeholder="Занятая вместимость"
-                value={newHall.takenCapacity}
-                onChange={handleInputChange}
-                min="0"
-                max={newHall.totalCapacity}
-                className="input w-full"
-                required
-              />
-            </div>
+            {editingHall && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Занятая вместимость</label>
+                <input
+                  type="number"
+                  value={editingHall.takenCapacity}
+                  className="input w-full bg-gray-100"
+                  disabled
+                  title="Это поле обновляется автоматически"
+                />
+                <p className="text-xs text-gray-500 mt-1">Обновляется автоматически при привязке пользователей</p>
+              </div>
+            )}
 
-            <div className="md:col-span-2">
+            <div className={editingHall ? "md:col-span-2" : "md:col-span-2"}>
               <label className="block text-sm font-medium text-gray-700 mb-1">Спецификация</label>
               <textarea
                 name="specification"
@@ -366,6 +352,7 @@ const Halls = () => {
                     <th>Название зала</th>
                     <th>Вместимость</th>
                     <th>Занято</th>
+                    <th>Статус</th>
                     <th>Управление</th>
                   </tr>
                 </thead>
@@ -380,11 +367,34 @@ const Halls = () => {
                           <span className="mr-2">{hall.takenCapacity}</span>
                           <div className="w-24 bg-gray-200 rounded-full h-2.5">
                             <div
-                              className="bg-blue-600 h-2.5 rounded-full"
+                              className={`h-2.5 rounded-full ${
+                                hall.takenCapacity === hall.totalCapacity
+                                  ? "bg-red-600"
+                                  : hall.takenCapacity / hall.totalCapacity > 0.8
+                                    ? "bg-yellow-600"
+                                    : "bg-blue-600"
+                              }`}
                               style={{ width: `${(hall.takenCapacity / hall.totalCapacity) * 100}%` }}
                             ></div>
                           </div>
                         </div>
+                      </td>
+                      <td>
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            hall.takenCapacity === hall.totalCapacity
+                              ? "bg-red-100 text-red-800"
+                              : hall.takenCapacity / hall.totalCapacity > 0.8
+                                ? "bg-yellow-100 text-yellow-800"
+                                : "bg-green-100 text-green-800"
+                          }`}
+                        >
+                          {hall.takenCapacity === hall.totalCapacity
+                            ? "Переполнен"
+                            : hall.takenCapacity / hall.totalCapacity > 0.8
+                              ? "Почти полон"
+                              : "Доступен"}
+                        </span>
                       </td>
                       <td>
                         <div className="flex space-x-2">
