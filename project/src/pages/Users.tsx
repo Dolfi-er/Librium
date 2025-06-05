@@ -419,7 +419,7 @@ const Users = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="login" className="block text-sm font-medium text-gray-700 mb-1">
-                    Логин**
+                    Логин** hreuig
                   </label>
                   <input
                     id="login"
@@ -510,84 +510,76 @@ const Users = () => {
                   </select>
                 </div>
 
-                {formData.roleId === 4 && (
-                  <div>
-                    <label htmlFor="hallId" className="block text-sm font-medium text-gray-700 mb-1">
-                      Зал*{" "}
-                      {getAvailableHalls().length === 0 && <span className="text-red-500">(Нет доступных залов)</span>}
-                    </label>
-                    <select
-                      id="hallId"
-                      name="hallId"
-                      value={formData.hallId || ""}
-                      onChange={handleInputChange}
-                      className="input"
-                      disabled={getAvailableHalls().length === 0}
-                    >
-                      <option value="">Выберите зал</option>
-                      {getAvailableHalls().map((hall) => (
-                        <option key={hall.id} value={hall.id}>
-                          {hall.hallName} ({hall.takenCapacity}/{hall.totalCapacity})
-                        </option>
-                      ))}
-                    </select>
-                    {getAvailableHalls().length === 0 && (
-                      <p className="text-xs text-red-500 mt-1">
-                        Все залы переполнены. Увеличьте вместимость залов или освободите места.
-                      </p>
-                    )}
-                  </div>
-                )}
+                <div>
+                  <label htmlFor="hallId" className="block text-sm font-medium text-gray-700 mb-1">
+                    Зал*{" "}
+                    {getAvailableHalls().length === 0 && <span className="text-red-500">(Нет доступных залов)</span>}
+                  </label>
+                  <select
+                    id="hallId"
+                    name="hallId"
+                    value={formData.hallId || ""}
+                    onChange={handleInputChange}
+                    className="input"
+                    disabled={getAvailableHalls().length === 0}
+                  >
+                    <option value="">Выберите зал</option>
+                    {getAvailableHalls().map((hall) => (
+                      <option key={hall.id} value={hall.id}>
+                        {hall.hallName} ({hall.takenCapacity}/{hall.totalCapacity})
+                      </option>
+                    ))}
+                  </select>
+                  {getAvailableHalls().length === 0 && (
+                    <p className="text-xs text-red-500 mt-1">
+                      Все залы переполнены. Увеличьте вместимость залов или освободите места.
+                    </p>
+                  )}
+                </div>
 
-                {formData.roleId === 4 && (
-                  <div>
-                    <label htmlFor="ticketNumber" className="block text-sm font-medium text-gray-700 mb-1">
-                      Номер билета*
-                    </label>
-                    <input
-                      id="ticketNumber"
-                      name="ticketNumber"
-                      type="text"
-                      value={formData.ticketNumber || ""}
-                      onChange={handleInputChange}
-                      className="input"
-                      placeholder="1234567890"
-                    />
-                  </div>
-                )}
+                <div>
+                  <label htmlFor="ticketNumber" className="block text-sm font-medium text-gray-700 mb-1">
+                    Номер билета*
+                  </label>
+                  <input
+                    id="ticketNumber"
+                    name="ticketNumber"
+                    type="text"
+                    value={formData.ticketNumber || ""}
+                    onChange={handleInputChange}
+                    className="input"
+                    placeholder="1234567890"
+                  />
+                </div>
 
-                {formData.roleId === 4 && (
-                  <div>
-                    <label htmlFor="birthday" className="block text-sm font-medium text-gray-700 mb-1">
-                      День рождения*
-                    </label>
-                    <input
-                      id="birthday"
-                      name="birthday"
-                      type="date"
-                      value={formData.birthday || ""}
-                      onChange={handleInputChange}
-                      className="input"
-                    />
-                  </div>
-                )}
+                <div>
+                  <label htmlFor="birthday" className="block text-sm font-medium text-gray-700 mb-1">
+                    День рождения*
+                  </label>
+                  <input
+                    id="birthday"
+                    name="birthday"
+                    type="date"
+                    value={formData.birthday || ""}
+                    onChange={handleInputChange}
+                    className="input"
+                  />
+                </div>
 
-                {formData.roleId === 4 && (
-                  <div className="md:col-span-2">
-                    <label htmlFor="education" className="block text-sm font-medium text-gray-700 mb-1">
-                      Образование*
-                    </label>
-                    <input
-                      id="education"
-                      name="education"
-                      type="text"
-                      value={formData.education || ""}
-                      onChange={handleInputChange}
-                      className="input"
-                      placeholder="Образование"
-                    />
-                  </div>
-                )}
+                <div className="md:col-span-2">
+                  <label htmlFor="education" className="block text-sm font-medium text-gray-700 mb-1">
+                    Образование*
+                  </label>
+                  <input
+                    id="education"
+                    name="education"
+                    type="text"
+                    value={formData.education || ""}
+                    onChange={handleInputChange}
+                    className="input"
+                    placeholder="Образование"
+                  />
+                </div>
               </div>
 
               <div className="pt-4 border-t flex justify-end space-x-3">
